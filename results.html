@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fi">
 
 <head>
@@ -11,19 +10,14 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-
   <title>
-
     OMKRY Live Results
-
   </title>
-
 
   <link
     rel="stylesheet"
     href="style.css"
   >
-
 
 </head>
 
@@ -32,7 +26,6 @@
 
 
 <header class="header">
-
 
   <div class="logo">
 
@@ -47,7 +40,6 @@
 
   </div>
 
-
 </header>
 
 
@@ -55,57 +47,87 @@
 <main class="results-container">
 
 
-<section>
+  <!-- ========================= -->
+  <!-- LAATIKKO-OLUET -->
+  <!-- ========================= -->
 
 
-<h1>
+  <section
+    class="results-category"
+  >
 
-  🏆 Kokonaistulokset
+    <h1>
 
-</h1>
+      📦 Laatikkooluet
 
-
-<div
-  id="totalVotes"
-  class="total-votes"
->
-
-  Ladataan...
-
-</div>
+    </h1>
 
 
-<div
-  id="podium"
-  class="podium"
->
+    <p
+      id="boxTotalVotes"
+      class="total-votes"
+    >
 
-</div>
+      Ladataan...
 
-
-</section>
-
+    </p>
 
 
-<section>
+    <div
+      id="boxPodium"
+      class="podium"
+    ></div>
 
 
-<h2>
-
-  🍺 Kaikki oluet
-
-</h2>
-
-
-<div
-  id="results"
-  class="results-list"
->
-
-</div>
+    <div
+      id="boxResults"
+      class="results-list"
+    ></div>
 
 
-</section>
+  </section>
+
+
+
+  <!-- ========================= -->
+  <!-- HANAOLUET -->
+  <!-- ========================= -->
+
+
+  <section
+    class="results-category"
+  >
+
+    <h1>
+
+      🍺 Hanaoluet
+
+    </h1>
+
+
+    <p
+      id="tapTotalVotes"
+      class="total-votes"
+    >
+
+      Ladataan...
+
+    </p>
+
+
+    <div
+      id="tapPodium"
+      class="podium"
+    ></div>
+
+
+    <div
+      id="tapResults"
+      class="results-list"
+    ></div>
+
+
+  </section>
 
 
 </main>
@@ -119,5 +141,4 @@
 
 
 </body>
-
 </html>
