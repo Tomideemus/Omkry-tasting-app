@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-
 <html lang="fi">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -13,118 +11,89 @@
 
   <title>OMKRY Beer Tasting</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
-
 
 <header class="header">
 
   <div class="logo">
-
     🍺 OMKRY
-
   </div>
-
 
   <div class="subtitle">
-
     BEER TASTING
-
   </div>
-
 
 </header>
 
 
-
 <main>
 
+  <section class="intro">
 
-<section class="intro">
+    <h1>Arvostele oluet</h1>
 
-  <h1>
+    <p>
+      Anna jokaiselle oluelle pisteet asteikolla 1–5.
+    </p>
 
-    Arvostele oluet
+    <p class="small-text">
+      Voit muuttaa antamaasi arviota myöhemmin.
+    </p>
 
-  </h1>
-
-
-  <p>
-
-    Anna jokaiselle oluelle pisteet asteikolla 1–5.
-
-  </p>
+  </section>
 
 
-  <div id="participantInfo">
+  <!-- LAATIKKO-OLUET -->
 
-  </div>
+  <section class="beer-section">
 
+    <h2>
+      📦 Laatikkooluet
+    </h2>
 
-</section>
+    <p class="category-info">
+      24 olutta – oma kilpailusarja
+    </p>
 
+    <div
+      id="bottleBeers"
+      class="beer-grid"
+    ></div>
 
-
-<section>
-
-
-<h2>
-
-  📦 Laatikkooluet
-
-</h2>
-
-
-<div
-  id="bottleBeers"
-  class="beer-grid"
->
-
-</div>
+  </section>
 
 
-</section>
+  <!-- HANAOLUET -->
 
+  <section class="beer-section tap-section">
 
+    <h2>
+      🍺 Hanaoluet
+    </h2>
 
-<section>
+    <p class="category-info">
+      4 olutta – oma kilpailusarja
+    </p>
 
+    <div
+      id="tapBeers"
+      class="beer-grid"
+    ></div>
 
-<h2>
-
-  🍺 Hanaoluet
-
-</h2>
-
-
-<div
-  id="tapBeers"
-  class="beer-grid"
->
-
-</div>
-
-
-</section>
+  </section>
 
 
 </main>
 
 
-
 <footer>
 
-  OMKRY Beer Tasting 🍺
+  🍺 OMKRY Beer Tasting
 
 </footer>
-
 
 
 <script
@@ -132,7 +101,5 @@
   src="app.js"
 ></script>
 
-
 </body>
-
 </html>
