@@ -8,231 +8,66 @@ import {
 "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
 
-
-/*
-================================
-OLUTLISTA
-================================
-*/
+// =================================
+// OLUTLISTA
+// =================================
 
 
 const beers = [
 
-  /*
-  LAATIKKO-OLUET
-  */
+  // =============================
+  // 24 LAATIKKO-OLUTTA
+  // =============================
 
-  {
-    id: "box01",
-    number: 1,
-    name: "Olut 1",
-    type: "box"
-  },
+  ...Array.from(
+    { length: 24 },
+    (_, index) => ({
 
-  {
-    id: "box02",
-    number: 2,
-    name: "Olut 2",
-    type: "box"
-  },
+      id:
+        `box${String(index + 1).padStart(2, "0")}`,
 
-  {
-    id: "box03",
-    number: 3,
-    name: "Olut 3",
-    type: "box"
-  },
+      number:
+        index + 1,
 
-  {
-    id: "box04",
-    number: 4,
-    name: "Olut 4",
-    type: "box"
-  },
+      name:
+        `Olut ${index + 1}`,
 
-  {
-    id: "box05",
-    number: 5,
-    name: "Olut 5",
-    type: "box"
-  },
+      type:
+        "box"
 
-  {
-    id: "box06",
-    number: 6,
-    name: "Olut 6",
-    type: "box"
-  },
-
-  {
-    id: "box07",
-    number: 7,
-    name: "Olut 7",
-    type: "box"
-  },
-
-  {
-    id: "box08",
-    number: 8,
-    name: "Olut 8",
-    type: "box"
-  },
-
-  {
-    id: "box09",
-    number: 9,
-    name: "Olut 9",
-    type: "box"
-  },
-
-  {
-    id: "box10",
-    number: 10,
-    name: "Olut 10",
-    type: "box"
-  },
-
-  {
-    id: "box11",
-    number: 11,
-    name: "Olut 11",
-    type: "box"
-  },
-
-  {
-    id: "box12",
-    number: 12,
-    name: "Olut 12",
-    type: "box"
-  },
-
-  {
-    id: "box13",
-    number: 13,
-    name: "Olut 13",
-    type: "box"
-  },
-
-  {
-    id: "box14",
-    number: 14,
-    name: "Olut 14",
-    type: "box"
-  },
-
-  {
-    id: "box15",
-    number: 15,
-    name: "Olut 15",
-    type: "box"
-  },
-
-  {
-    id: "box16",
-    number: 16,
-    name: "Olut 16",
-    type: "box"
-  },
-
-  {
-    id: "box17",
-    number: 17,
-    name: "Olut 17",
-    type: "box"
-  },
-
-  {
-    id: "box18",
-    number: 18,
-    name: "Olut 18",
-    type: "box"
-  },
-
-  {
-    id: "box19",
-    number: 19,
-    name: "Olut 19",
-    type: "box"
-  },
-
-  {
-    id: "box20",
-    number: 20,
-    name: "Olut 20",
-    type: "box"
-  },
-
-  {
-    id: "box21",
-    number: 21,
-    name: "Olut 21",
-    type: "box"
-  },
-
-  {
-    id: "box22",
-    number: 22,
-    name: "Olut 22",
-    type: "box"
-  },
-
-  {
-    id: "box23",
-    number: 23,
-    name: "Olut 23",
-    type: "box"
-  },
-
-  {
-    id: "box24",
-    number: 24,
-    name: "Olut 24",
-    type: "box"
-  },
+    })
+  ),
 
 
-  /*
-  HANAOLUET
-  */
+  // =============================
+  // 4 HANAOLUTTA
+  // =============================
 
+  ...Array.from(
+    { length: 4 },
+    (_, index) => ({
 
-  {
-    id: "tap01",
-    number: 1,
-    name: "Hanaolut 1",
-    type: "tap"
-  },
+      id:
+        `tap${String(index + 1).padStart(2, "0")}`,
 
-  {
-    id: "tap02",
-    number: 2,
-    name: "Hanaolut 2",
-    type: "tap"
-  },
+      number:
+        index + 1,
 
-  {
-    id: "tap03",
-    number: 3,
-    name: "Hanaolut 3",
-    type: "tap"
-  },
+      name:
+        `Hana ${index + 1}`,
 
-  {
-    id: "tap04",
-    number: 4,
-    name: "Hanaolut 4",
-    type: "tap"
-  }
+      type:
+        "tap"
+
+    })
+  )
 
 ];
 
 
-
-/*
-================================
-LUO OSALLISTUJA ID
-================================
-*/
+// =================================
+// OSALLISTUJA ID
+// =================================
 
 
 let participantId =
@@ -255,123 +90,83 @@ if (!participantId) {
 }
 
 
-
-document
-  .getElementById(
-    "participantInfo"
-  )
-  .innerHTML =
-
-  `
-  <div class="participant">
-
-    📱 Äänestät omalla laitteellasi
-
-  </div>
-  `;
+// =================================
+// OLUTKORTTI
+// =================================
 
 
-
-
-/*
-================================
-RENDERÖI OLUT
-================================
-*/
-
-
-function renderBeer(
-  beer
-) {
-
+function renderBeer(beer) {
 
   return `
 
-  <div
-    class="beer-card"
-  >
+    <div class="beer-card">
+
+      <div class="beer-number">
+
+        ${beer.type === "box"
+          ? "📦 Olut"
+          : "🍺 Hana"}
+
+        ${beer.number}
+
+      </div>
 
 
-    <div
-      class="beer-number"
-    >
+      <div class="beer-name">
 
-      ${beer.type === "tap"
-        ? "🍺 HANA " + beer.number
-        : "📦 " + beer.number}
+        ${beer.name}
 
-    </div>
+      </div>
 
 
+      <div class="rating">
 
-    <div
-      class="beer-name"
-    >
+        ${[1, 2, 3, 4, 5]
+          .map(
+            score => `
 
-      ${beer.name}
+              <button
+                class="star"
+                data-beer="${beer.id}"
+                data-score="${score}"
+                aria-label="Anna ${score} pistettä"
+              >
+                ⭐
+              </button>
 
-    </div>
+            `
+          )
+          .join("")
+        }
 
-
-
-    <div
-      class="rating"
-    >
-
-      ${[1, 2, 3, 4, 5]
-        .map(
-          score =>
-
-          `
-
-          <button
-            class="star"
-            data-beer="${beer.id}"
-            data-score="${score}"
-          >
-
-            ⭐
-
-          </button>
-
-          `
-        )
-        .join("")
-      }
-
-    </div>
+      </div>
 
 
+      <div
+        class="rating-text"
+        id="rating-${beer.id}"
+      >
 
-    <div
-      class="rating-text"
-      id="rating-${beer.id}"
-    >
+        Ei vielä arvosteltu
 
-      Ei vielä arvosteltu
+      </div>
 
     </div>
-
-
-  </div>
 
   `;
 
 }
 
 
-
-/*
-================================
-RENDERÖI OLUTLISTAT
-================================
-*/
+// =================================
+// RENDERÖI OLUTLISTAT
+// =================================
 
 
 function renderBeers() {
 
 
-  const bottleBeers =
+  const boxBeers =
     beers.filter(
       beer =>
         beer.type === "box"
@@ -385,17 +180,15 @@ function renderBeers() {
     );
 
 
-
   document
     .getElementById(
       "bottleBeers"
     )
     .innerHTML =
 
-    bottleBeers
+    boxBeers
       .map(renderBeer)
       .join("");
-
 
 
   document
@@ -409,19 +202,14 @@ function renderBeers() {
       .join("");
 
 
-
   loadUserRatings();
-
 
 }
 
 
-
-/*
-================================
-TALLENNA ÄÄNI
-================================
-*/
+// =================================
+// TALLENNA ÄÄNI
+// =================================
 
 
 async function vote(
@@ -430,51 +218,59 @@ async function vote(
 ) {
 
 
-  const voteRef =
-    ref(
-      database,
-      `votes/${beerId}/${participantId}`
+  try {
+
+    const voteRef =
+      ref(
+        database,
+        `votes/${beerId}/${participantId}`
+      );
+
+
+    await set(
+      voteRef,
+      {
+        score: score,
+        updatedAt: Date.now()
+      }
     );
 
 
+    document
+      .getElementById(
+        `rating-${beerId}`
+      )
+      .innerHTML =
 
-  await set(
-    voteRef,
-    {
-      score: score,
-      updatedAt:
-        Date.now()
-    }
-  );
+      `
+        Oma arviosi:
+
+        <strong>
+          ${score} / 5 ⭐
+        </strong>
+      `;
 
 
+  }
 
-  document
-    .getElementById(
-      `rating-${beerId}`
-    )
-    .innerHTML =
+  catch (error) {
 
-    `
-    Oma arviosi:
+    console.error(error);
 
-    <strong>
 
-      ${score} / 5 ⭐
+    alert(
+      "Äänen tallentaminen epäonnistui. Tarkista internet-yhteys."
+    );
 
-    </strong>
-    `;
+  }
 
 
 }
 
 
-
-/*
-================================
-ÄÄNESTYSNAPIT
-================================
-*/
+// =================================
+// ÄÄNESTYSNAPIT
+// =================================
 
 
 document.addEventListener(
@@ -512,13 +308,9 @@ document.addEventListener(
 );
 
 
-
-
-/*
-================================
-LATAA AIEMMAT ÄÄNET
-================================
-*/
+// =================================
+// LATAA AIEMMAT ÄÄNET
+// =================================
 
 
 async function loadUserRatings() {
@@ -558,13 +350,11 @@ async function loadUserRatings() {
         .innerHTML =
 
         `
-        Oma arviosi:
+          Oma arviosi:
 
-        <strong>
-
-          ${data.score} / 5 ⭐
-
-        </strong>
+          <strong>
+            ${data.score} / 5 ⭐
+          </strong>
         `;
 
 
@@ -576,6 +366,10 @@ async function loadUserRatings() {
 
 }
 
+
+// =================================
+// KÄYNNISTÄ SOVELLUS
+// =================================
 
 
 renderBeers();
