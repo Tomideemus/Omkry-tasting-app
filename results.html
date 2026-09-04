@@ -22,123 +22,391 @@
 </head>
 
 
-<body class="results-page">
+<body class="results-body">
 
 
-<header class="header">
+<header class="topbar">
 
-  <div class="logo">
 
-    🍺 OMKRY
+  <div class="brand">
+
+
+    <span class="brand-icon">
+
+      🍺
+
+    </span>
+
+
+    <span class="brand-name">
+
+      OMKRY
+
+    </span>
+
+
+    <span class="brand-subtitle">
+
+      BEER TASTING
+
+    </span>
+
 
   </div>
 
 
-  <div class="subtitle">
 
-    LIVE RESULTS
+  <div class="live-status">
+
+
+    <span class="live-dot">
+
+      ●
+
+    </span>
+
+
+    PÄIVITTYY LIVE
+
 
   </div>
+
 
 </header>
 
 
 
-<main class="results-container">
+<main class="results-page">
 
 
-  <!-- ========================= -->
-  <!-- LAATIKKO-OLUET -->
-  <!-- ========================= -->
+  <div class="results-title">
 
-
-  <section
-    class="results-category"
-  >
 
     <h1>
 
-      📦 Laatikkooluet
+      LIVE RESULTS
 
     </h1>
 
 
-    <p
-      id="boxTotalVotes"
-      class="total-votes"
-    >
+    <p>
 
-      Ladataan...
+      Tulokset päivittyvät reaaliajassa
 
     </p>
 
 
-    <div
-      id="boxPodium"
-      class="podium"
-    ></div>
-
-
-    <div
-      id="boxResults"
-      class="results-list"
-    ></div>
-
-
-  </section>
+  </div>
 
 
 
-  <!-- ========================= -->
-  <!-- HANAOLUET -->
-  <!-- ========================= -->
+  <div class="results-columns">
 
 
-  <section
-    class="results-category"
-  >
-
-    <h1>
-
-      🍺 Hanaoluet
-
-    </h1>
+    <!-- LAATIKKO-OLUET -->
 
 
-    <p
-      id="tapTotalVotes"
-      class="total-votes"
+    <section class="results-category-card box-results-card">
+
+
+      <div class="results-category-header">
+
+
+        <h2>
+
+          📦 LAATIKKOOLUET
+
+        </h2>
+
+
+        <span id="boxVoteCount">
+
+          Yhteensä ääniä: 0
+
+        </span>
+
+
+      </div>
+
+
+
+      <div
+
+        id="boxPodium"
+
+        class="podium"
+
+      ></div>
+
+
+
+      <div
+
+        id="boxRanking"
+
+        class="ranking-list"
+
+      ></div>
+
+
+
+      <button
+
+        class="show-all-button box-button"
+
+        id="showBoxWinner"
+
+      >
+
+        🏆 KATSO LAATIKKOVOITTAJA
+
+      </button>
+
+
+    </section>
+
+
+
+    <!-- HANAOLUET -->
+
+
+    <section class="results-category-card tap-results-card">
+
+
+      <div class="results-category-header">
+
+
+        <h2>
+
+          🍺 HANAOLUET
+
+        </h2>
+
+
+        <span id="tapVoteCount">
+
+          Yhteensä ääniä: 0
+
+        </span>
+
+
+      </div>
+
+
+
+      <div
+
+        id="tapPodium"
+
+        class="podium"
+
+      ></div>
+
+
+
+      <div
+
+        id="tapRanking"
+
+        class="ranking-list"
+
+      ></div>
+
+
+
+      <button
+
+        class="show-all-button tap-button"
+
+        id="showTapWinner"
+
+      >
+
+        🏆 KATSO HANAVOITTAJA
+
+      </button>
+
+
+    </section>
+
+
+  </div>
+
+
+
+  <div class="winner-controls">
+
+
+    <button
+
+      id="showBothWinners"
+
+      class="winner-main-button"
+
     >
 
-      Ladataan...
+      🏆 KATSO VOITTAJAT
 
-    </p>
-
-
-    <div
-      id="tapPodium"
-      class="podium"
-    ></div>
+    </button>
 
 
-    <div
-      id="tapResults"
-      class="results-list"
-    ></div>
-
-
-  </section>
+  </div>
 
 
 </main>
 
 
 
+<!-- VOITTAJA-ANIMAATIO -->
+
+
+<div
+
+  id="winnerModal"
+
+  class="winner-modal"
+
+>
+
+
+  <div
+
+    id="winnerBackground"
+
+    class="winner-background"
+
+  ></div>
+
+
+
+  <button
+
+    id="closeWinner"
+
+    class="winner-close"
+
+  >
+
+    ✕
+
+  </button>
+
+
+
+  <div
+
+    id="winnerContent"
+
+    class="winner-content"
+
+  >
+
+
+    <div
+
+      id="confetti"
+
+      class="confetti-container"
+
+    ></div>
+
+
+
+    <div
+
+      id="winnerCategory"
+
+      class="winner-category"
+
+    ></div>
+
+
+
+    <h1>
+
+      VOITTAJA!
+
+    </h1>
+
+
+
+    <div class="winner-laurels">
+
+      🏆
+
+    </div>
+
+
+
+    <div
+
+      id="winnerIcon"
+
+      class="winner-icon"
+
+    ></div>
+
+
+
+    <div
+
+      id="winnerName"
+
+      class="winner-name"
+
+    ></div>
+
+
+
+    <div
+
+      id="winnerScore"
+
+      class="winner-score"
+
+    ></div>
+
+
+
+    <div
+
+      id="winnerVotes"
+
+      class="winner-votes"
+
+    ></div>
+
+
+
+    <button
+
+      id="winnerNextButton"
+
+      class="winner-next-button"
+
+    >
+
+      SULJE
+
+    </button>
+
+
+  </div>
+
+
+</div>
+
+
+
 <script
+
   type="module"
+
   src="results.js"
+
 ></script>
 
 
 </body>
+
 </html>
