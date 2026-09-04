@@ -1,285 +1,2145 @@
-* {
-  box-sizing: border-box;
+/* =====================================
+   PERUSASETUKSET
+===================================== */
+
+:root {
+
+  --background: #050708;
+  --panel: #0b1013;
+  --panel-light: #10171b;
+  --border: #283036;
+
+  --text: #f1f3f4;
+  --muted: #929aa0;
+
+  --gold: #f4b72a;
+  --gold-light: #ffd56a;
+  --gold-dark: #8d6412;
+
+  --blue: #4fa9ff;
+  --blue-light: #7dc4ff;
+  --blue-dark: #155ca5;
+
+  --green: #62d96b;
+
 }
+
+
+* {
+
+  box-sizing: border-box;
+
+}
+
+
+html {
+
+  background: var(--background);
+
+}
+
 
 body {
+
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
-}
 
-.header {
-  text-align: center;
-  padding: 30px 20px;
-  background: #1b1b1b;
-  border-bottom: 3px solid #d9a441;
-}
+  min-height: 100vh;
 
-.logo {
-  font-size: 40px;
-  font-weight: bold;
-}
+  font-family:
 
-.subtitle {
-  margin-top: 8px;
-  letter-spacing: 5px;
-  color: #d9a441;
-}
+    Arial,
+    Helvetica,
+    sans-serif;
 
-main {
-  max-width: 1300px;
-  margin: auto;
-  padding: 25px;
-}
+  color: var(--text);
 
-.intro {
-  text-align: center;
-  margin-bottom: 40px;
-}
+  background:
 
-.small-text {
-  color: #aaa;
-  font-size: 14px;
-}
-
-.beer-section {
-  margin-top: 50px;
-}
-
-.tap-section {
-  margin-top: 80px;
-  padding-top: 30px;
-  border-top: 2px solid #333;
-}
-
-h2 {
-  font-size: 28px;
-  border-bottom: 1px solid #333;
-  padding-bottom: 12px;
-}
-
-.category-info {
-  color: #aaa;
-  margin-bottom: 25px;
-}
-
-.beer-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(220px, 1fr)
+    radial-gradient(
+      circle at top,
+      #10191c,
+      #050708 55%
     );
 
-  gap: 15px;
 }
 
-.beer-card {
-  background: #1c1c1c;
-  border: 1px solid #333;
-  border-radius: 14px;
-  padding: 20px;
-  text-align: center;
-}
 
-.beer-number {
-  color: #d9a441;
-  font-size: 15px;
-}
+/* =====================================
+   TOPBAR
+===================================== */
 
-.beer-name {
-  font-size: 22px;
-  font-weight: bold;
-  margin: 12px 0 20px;
-}
+.topbar {
 
-.rating {
+  min-height: 70px;
+
   display: flex;
-  justify-content: center;
-  gap: 4px;
-}
-
-.star {
-  font-size: 26px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.star:active {
-  transform: scale(0.9);
-}
-
-.rating-text {
-  margin-top: 15px;
-  color: #aaa;
-  font-size: 14px;
-}
-
-footer {
-  text-align: center;
-  padding: 40px;
-  color: #777;
-}
-
-
-/* ================================= */
-/* LIVE RESULTS */
-/* ================================= */
-
-
-.results-category {
-  margin-bottom: 100px;
-}
-
-.results-category h1 {
-  font-size: 38px;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.total-votes {
-  text-align: center;
-  color: #bbb;
-  font-size: 20px;
-  margin-bottom: 35px;
-}
-
-.podium {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 20px;
-
-  margin-bottom: 40px;
-}
-
-.podium-card {
-  background: #1d1d1d;
-  border-radius: 15px;
-  text-align: center;
-  padding: 25px;
-  border: 1px solid #333;
-}
-
-.medal {
-  font-size: 50px;
-}
-
-.podium-card h3 {
-  margin: 10px 0;
-  font-size: 22px;
-}
-
-.podium-score {
-  font-size: 30px;
-  color: #d9a441;
-  font-weight: bold;
-}
-
-.results-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.result-row {
-  display: grid;
-
-  grid-template-columns:
-    60px
-    180px
-    1fr
-    100px
-    100px;
-
-  gap: 15px;
 
   align-items: center;
 
-  background: #1c1c1c;
+  justify-content: space-between;
 
-  padding: 15px;
+  padding: 0 4%;
 
-  border-radius: 10px;
+  border-bottom:
+
+    1px solid
+    var(--gold-dark);
+
+  background:
+
+    rgba(
+      4,
+      7,
+      8,
+      0.96
+    );
+
 }
 
-.rank {
-  font-size: 22px;
-  font-weight: bold;
+
+.brand {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+
+.brand-icon {
+
+  font-size: 30px;
+
+}
+
+
+.brand-name {
+
+  font-size: 30px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+}
+
+
+.brand-subtitle {
+
+  color: var(--gold-light);
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+}
+
+
+.live-results-button {
+
+  text-decoration: none;
+
+  color: var(--text);
+
+  border:
+
+    1px solid
+    #3b4348;
+
+  border-radius: 8px;
+
+  padding: 12px 18px;
+
+  font-size: 13px;
+
+}
+
+
+.live-results-button:hover {
+
+  border-color: var(--gold);
+
+  color: var(--gold-light);
+
+}
+
+
+/* =====================================
+   ÄÄNESTYSSIVU
+===================================== */
+
+.voting-page {
+
+  max-width: 1500px;
+
+  margin: auto;
+
+  padding:
+
+    30px
+    3%
+    60px;
+
+}
+
+
+.voting-intro {
+
   text-align: center;
+
+  margin-bottom: 25px;
+
 }
 
-.result-name {
-  font-size: 18px;
+
+.voting-intro h1 {
+
+  margin: 0;
+
+  font-size: 32px;
+
 }
 
-.bar-container {
-  height: 28px;
-  background: #333;
-  border-radius: 20px;
-  overflow: hidden;
+
+.voting-intro p {
+
+  color: var(--muted);
+
+  margin: 10px 0;
+
 }
 
-.bar {
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    #d9a441,
-    #ffcc66
-  );
 
-  border-radius: 20px;
+.voting-help {
+
+  font-size: 13px;
+
+}
+
+
+/* =====================================
+   KATEGORIAT
+===================================== */
+
+.beer-category {
+
+  border-radius: 14px;
+
+  padding: 18px;
+
+  margin-top: 18px;
+
+  background:
+
+    rgba(
+      12,
+      17,
+      19,
+      0.9
+    );
+
+}
+
+
+.box-category {
+
+  border:
+
+    1px solid
+    rgba(
+      244,
+      183,
+      42,
+      0.45
+    );
+
+  background:
+
+    radial-gradient(
+      circle at top left,
+      rgba(
+        103,
+        73,
+        9,
+        0.24
+      ),
+      rgba(
+        10,
+        14,
+        14,
+        0.95
+      )
+    );
+
+}
+
+
+.tap-category {
+
+  border:
+
+    1px solid
+    rgba(
+      79,
+      169,
+      255,
+      0.45
+    );
+
+  background:
+
+    radial-gradient(
+      circle at top right,
+      rgba(
+        20,
+        74,
+        124,
+        0.22
+      ),
+      rgba(
+        8,
+        14,
+        19,
+        0.95
+      )
+    );
+
+}
+
+
+.category-header {
+
+  margin-bottom: 15px;
+
+}
+
+
+.category-header h2 {
+
+  margin: 0;
+
+  font-size: 22px;
+
+  letter-spacing: 1px;
+
+}
+
+
+.box-category h2 {
+
+  color: var(--gold-light);
+
+}
+
+
+.tap-category h2 {
+
+  color: var(--blue-light);
+
+}
+
+
+.category-header h2 span {
+
+  font-size: 14px;
+
+  color: var(--muted);
+
+}
+
+
+/* =====================================
+   OLUTRUUDUKKO
+===================================== */
+
+.beer-grid {
+
+  display: grid;
+
+  grid-template-columns:
+
+    repeat(
+      5,
+      1fr
+    );
+
+  gap: 10px;
+
+}
+
+
+.tap-grid {
+
+  display: grid;
+
+  grid-template-columns:
+
+    repeat(
+      4,
+      1fr
+    );
+
+  gap: 12px;
+
+}
+
+
+/* =====================================
+   OLUTKORTTI
+===================================== */
+
+.beer-card {
+
+  min-height: 145px;
+
+  padding:
+
+    16px
+    12px;
+
+  border-radius: 8px;
+
+  background:
+
+    linear-gradient(
+      145deg,
+      #11191c,
+      #080d0f
+    );
+
+  border:
+
+    1px solid
+    #293237;
+
+  text-align: center;
 
   transition:
-    width 0.5s ease;
+
+    transform 0.2s,
+    border-color 0.2s;
+
 }
 
-.score {
-  font-size: 20px;
+
+.beer-card:hover {
+
+  transform:
+
+    translateY(-2px);
+
+}
+
+
+.box-beer-card:hover {
+
+  border-color:
+
+    var(--gold-dark);
+
+}
+
+
+.tap-beer-card:hover {
+
+  border-color:
+
+    var(--blue);
+
+}
+
+
+.beer-card-title {
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+
+  min-height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+}
+
+
+.beer-small-icon {
+
+  font-size: 18px;
+
+}
+
+
+/* =====================================
+   TÄHTIEN ÄÄNESTYS
+===================================== */
+
+.rating {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 3px;
+
+  margin-top: 10px;
+
+}
+
+
+/* =====================================
+   OLETUSTILA
+
+   HARMAA + TYHJÄ ☆
+===================================== */
+
+.star-button {
+
+  appearance: none;
+
+  border: none;
+
+  background: transparent;
+
+  color: #586167;
+
+  font-size: 28px;
+
+  padding: 0;
+
+  cursor: pointer;
+
+  line-height: 1;
+
+  transition:
+
+    color 0.2s ease,
+    transform 0.15s ease,
+    text-shadow 0.2s ease;
+
+}
+
+
+/* =====================================
+   KELTAINEN VAIN,
+   KUN PISTE ON ANNATTU ★
+===================================== */
+
+.star-button.selected {
+
+  color: var(--gold);
+
+  text-shadow:
+
+    0 0 12px
+    rgba(
+      244,
+      183,
+      42,
+      0.55
+    );
+
+}
+
+
+/* =====================================
+   HOVER EI TEE TÄHTEÄ
+   PYSYVÄSTI KELTAISEKSI
+===================================== */
+
+.star-button:hover {
+
+  transform:
+
+    scale(1.12);
+
+}
+
+
+.star-button:active {
+
+  transform:
+
+    scale(0.9);
+
+}
+
+
+.score-numbers {
+
+  display: grid;
+
+  grid-template-columns:
+
+    repeat(
+      5,
+      1fr
+    );
+
+  margin:
+
+    4px
+    auto
+    8px;
+
+  max-width: 145px;
+
+  color: var(--muted);
+
+  font-size: 10px;
+
+}
+
+
+.save-status {
+
+  min-height: 20px;
+
+  margin-top: 8px;
+
+  font-size: 12px;
+
+  color: #798187;
+
+}
+
+
+.saved-check {
+
+  color: var(--green);
+
   font-weight: bold;
-  text-align: center;
-}
 
-.votes {
-  color: #aaa;
-  text-align: center;
 }
 
 
-/* ================================= */
-/* MOBILE */
-/* ================================= */
+.change-info {
+
+  text-align: center;
+
+  color: var(--muted);
+
+  margin-top: 20px;
+
+  font-size: 13px;
+
+}
 
 
-@media (max-width: 700px) {
+/* =====================================
+   LIVE RESULTS
+===================================== */
 
-  .logo {
-    font-size: 32px;
+.results-page {
+
+  max-width: 1800px;
+
+  margin: auto;
+
+  padding:
+
+    18px
+    2%
+    40px;
+
+}
+
+
+.results-title {
+
+  text-align: center;
+
+  margin:
+
+    10px
+    0
+    20px;
+
+}
+
+
+.results-title h1 {
+
+  margin: 0;
+
+  font-size: 32px;
+
+  letter-spacing: 1px;
+
+}
+
+
+.results-title p {
+
+  color: var(--muted);
+
+  margin: 8px;
+
+}
+
+
+.live-status {
+
+  color: #aab2b6;
+
+  font-size: 13px;
+
+}
+
+
+.live-dot {
+
+  color: #69dc76;
+
+  animation:
+
+    pulse-dot
+    1.5s
+    infinite;
+
+}
+
+
+@keyframes pulse-dot {
+
+  0% {
+
+    opacity: 0.4;
+
   }
+
+
+  50% {
+
+    opacity: 1;
+
+  }
+
+
+  100% {
+
+    opacity: 0.4;
+
+  }
+
+}
+
+
+.results-columns {
+
+  display: grid;
+
+  grid-template-columns:
+
+    1fr
+    1fr;
+
+  gap: 18px;
+
+}
+
+
+.results-category-card {
+
+  min-width: 0;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  background: #0b1114;
+
+}
+
+
+.box-results-card {
+
+  border:
+
+    1px solid
+    rgba(
+      244,
+      183,
+      42,
+      0.45
+    );
+
+}
+
+
+.tap-results-card {
+
+  border:
+
+    1px solid
+    rgba(
+      79,
+      169,
+      255,
+      0.45
+    );
+
+}
+
+
+.results-category-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding:
+
+    16px
+    20px;
+
+}
+
+
+.results-category-header h2 {
+
+  margin: 0;
+
+  font-size: 20px;
+
+  letter-spacing: 1px;
+
+}
+
+
+.box-results-card
+.results-category-header h2 {
+
+  color: var(--gold-light);
+
+}
+
+
+.tap-results-card
+.results-category-header h2 {
+
+  color: var(--blue-light);
+
+}
+
+
+.results-category-header span {
+
+  font-size: 13px;
+
+  color: var(--muted);
+
+}
+
+
+/* =====================================
+   PODIUM
+===================================== */
+
+.podium {
+
+  min-height: 215px;
+
+  display: grid;
+
+  grid-template-columns:
+
+    repeat(
+      3,
+      1fr
+    );
+
+  align-items: end;
+
+  padding:
+
+    10px
+    20px
+    20px;
+
+  border-top:
+
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.05
+    );
+
+  border-bottom:
+
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+
+}
+
+
+.podium-place {
+
+  text-align: center;
+
+  min-height: 180px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+}
+
+
+.place-1 {
+
+  transform:
+
+    translateY(-15px);
+
+}
+
+
+.podium-medal {
+
+  font-size: 27px;
+
+  margin-bottom: 5px;
+
+}
+
+
+.podium-icon {
+
+  font-size: 45px;
+
+  margin: 4px 0;
+
+}
+
+
+.podium-beer-name {
+
+  font-size: 17px;
+
+  font-weight: 800;
+
+}
+
+
+.podium-average {
+
+  margin-top: 8px;
+
+  font-size: 21px;
+
+  font-weight: 800;
+
+  color: var(--gold-light);
+
+}
+
+
+.tap-results-card
+.podium-average {
+
+  color: var(--blue-light);
+
+}
+
+
+.podium-votes {
+
+  margin-top: 5px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+
+}
+
+
+.no-results {
+
+  grid-column: 1 / -1;
+
+  text-align: center;
+
+  color: var(--muted);
+
+}
+
+
+/* =====================================
+   RANKING
+===================================== */
+
+.ranking-list {
+
+  padding:
+
+    12px
+    18px;
+
+  min-height: 245px;
+
+}
+
+
+.ranking-row {
+
+  display: grid;
+
+  grid-template-columns:
+
+    35px
+    100px
+    1fr
+    55px
+    35px;
+
+  gap: 10px;
+
+  align-items: center;
+
+  margin: 10px 0;
+
+  font-size: 13px;
+
+}
+
+
+.ranking-position {
+
+  color: var(--muted);
+
+}
+
+
+.ranking-name {
+
+  white-space: nowrap;
+
+}
+
+
+.ranking-bar-background {
+
+  height: 9px;
+
+  background: #242b2e;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+}
+
+
+.ranking-bar {
+
+  height: 100%;
+
+  border-radius: 10px;
+
+  transition:
+
+    width
+    0.5s
+    ease;
+
+}
+
+
+.box-bar {
+
+  background:
+
+    linear-gradient(
+
+      90deg,
+
+      #d58c15,
+
+      #ffd45d
+
+    );
+
+}
+
+
+.tap-bar {
+
+  background:
+
+    linear-gradient(
+
+      90deg,
+
+      #2875c0,
+
+      #7ec7ff
+
+    );
+
+}
+
+
+.ranking-score {
+
+  text-align: right;
+
+  font-weight: bold;
+
+}
+
+
+.ranking-votes {
+
+  color: var(--muted);
+
+  text-align: right;
+
+}
+
+
+.no-results-small {
+
+  color: var(--muted);
+
+  text-align: center;
+
+  padding: 30px;
+
+}
+
+
+/* =====================================
+   PAINIKKEET
+===================================== */
+
+.show-all-button {
+
+  width:
+
+    calc(
+      100% - 36px
+    );
+
+  margin:
+
+    8px
+    18px
+    18px;
+
+  padding: 13px;
+
+  background: transparent;
+
+  color: var(--text);
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+
+}
+
+
+.box-button {
+
+  border:
+
+    1px solid
+    var(--gold-dark);
+
+}
+
+
+.box-button:hover {
+
+  background:
+
+    rgba(
+      244,
+      183,
+      42,
+      0.1
+    );
+
+}
+
+
+.tap-button {
+
+  border:
+
+    1px solid
+    var(--blue-dark);
+
+}
+
+
+.tap-button:hover {
+
+  background:
+
+    rgba(
+      79,
+      169,
+      255,
+      0.1
+    );
+
+}
+
+
+.winner-controls {
+
+  text-align: center;
+
+  margin-top: 20px;
+
+}
+
+
+.winner-main-button {
+
+  min-width: 280px;
+
+  padding:
+
+    15px
+    30px;
+
+  border-radius: 8px;
+
+  border:
+
+    1px solid
+    var(--gold-dark);
+
+  background:
+
+    linear-gradient(
+      90deg,
+      #15140c,
+      #25200b
+    );
+
+  color: var(--gold-light);
+
+  font-weight: bold;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+}
+
+
+/* =====================================
+   VOITTAJA MODAL
+===================================== */
+
+.winner-modal {
+
+  position: fixed;
+
+  inset: 0;
+
+  display: none;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 9999;
+
+  overflow: hidden;
+
+}
+
+
+.winner-modal.active {
+
+  display: flex;
+
+}
+
+
+.winner-background {
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+
+    rgba(
+      0,
+      0,
+      0,
+      0.8
+    );
+
+  backdrop-filter:
+
+    blur(5px);
+
+}
+
+
+.winner-content {
+
+  position: relative;
+
+  width:
+
+    min(
+      92vw,
+      950px
+    );
+
+  min-height:
+
+    min(
+      88vh,
+      800px
+    );
+
+  z-index: 2;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+}
+
+
+.box-winner {
+
+  background:
+
+    radial-gradient(
+
+      circle,
+
+      rgba(
+        150,
+        94,
+        7,
+        0.75
+      ),
+
+      #120d03 65%,
+
+      #040404
+
+    );
+
+  border:
+
+    1px solid
+    var(--gold-dark);
+
+  box-shadow:
+
+    0 0 80px
+    rgba(
+      244,
+      183,
+      42,
+      0.45
+    );
+
+}
+
+
+.tap-winner {
+
+  background:
+
+    radial-gradient(
+
+      circle,
+
+      rgba(
+        12,
+        96,
+        177,
+        0.75
+      ),
+
+      #06111f 65%,
+
+      #020406
+
+    );
+
+  border:
+
+    1px solid
+    var(--blue-dark);
+
+  box-shadow:
+
+    0 0 90px
+    rgba(
+      60,
+      155,
+      255,
+      0.45
+    );
+
+}
+
+
+.winner-category {
+
+  padding:
+
+    10px
+    45px;
+
+  border-radius: 8px;
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 10px;
+
+}
+
+
+.box-winner
+.winner-category {
+
+  background:
+
+    linear-gradient(
+      90deg,
+      #b5790e,
+      #ffd56a,
+      #b5790e
+    );
+
+  color: #191102;
+
+}
+
+
+.tap-winner
+.winner-category {
+
+  background:
+
+    linear-gradient(
+      90deg,
+      #155b9f,
+      #77c4ff,
+      #155b9f
+    );
+
+}
+
+
+.winner-content h1 {
+
+  font-size:
+
+    clamp(
+      40px,
+      8vw,
+      85px
+    );
+
+  margin:
+
+    0
+    0
+    10px;
+
+  letter-spacing: 3px;
+
+}
+
+
+.winner-laurels {
+
+  font-size: 40px;
+
+  color: var(--gold-light);
+
+}
+
+
+.tap-winner
+.winner-laurels {
+
+  color: var(--blue-light);
+
+}
+
+
+.winner-icon {
+
+  font-size:
+
+    clamp(
+      100px,
+      18vw,
+      190px
+    );
+
+  margin: 5px 0;
+
+}
+
+
+.winner-name {
+
+  min-width:
+
+    min(
+      80%,
+      500px
+    );
+
+  padding:
+
+    14px
+    35px;
+
+  background:
+
+    rgba(
+      5,
+      8,
+      10,
+      0.8
+    );
+
+  border:
+
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.25
+    );
+
+  border-radius: 10px;
+
+  font-size:
+
+    clamp(
+      30px,
+      6vw,
+      55px
+    );
+
+  font-weight: 900;
+
+}
+
+
+.winner-score {
+
+  margin-top: 15px;
+
+  font-size:
+
+    clamp(
+      35px,
+      7vw,
+      65px
+    );
+
+  font-weight: 900;
+
+  color: var(--gold-light);
+
+}
+
+
+.tap-winner
+.winner-score {
+
+  color: var(--blue-light);
+
+}
+
+
+.winner-votes {
+
+  color: #e0e4e6;
+
+  margin-top: 5px;
+
+  font-size: 18px;
+
+}
+
+
+.winner-next-button {
+
+  margin-top: 25px;
+
+  min-width: 180px;
+
+  padding:
+
+    13px
+    30px;
+
+  border-radius: 8px;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-weight: bold;
+
+}
+
+
+.box-winner
+.winner-next-button {
+
+  background:
+
+    rgba(
+      150,
+      100,
+      15,
+      0.7
+    );
+
+  border:
+
+    1px solid
+    var(--gold-light);
+
+}
+
+
+.tap-winner
+.winner-next-button {
+
+  background:
+
+    rgba(
+      20,
+      92,
+      170,
+      0.7
+    );
+
+  border:
+
+    1px solid
+    var(--blue-light);
+
+}
+
+
+.winner-close {
+
+  position: absolute;
+
+  z-index: 5;
+
+  top: 25px;
+
+  right: 30px;
+
+  border: none;
+
+  background: transparent;
+
+  color: white;
+
+  font-size: 28px;
+
+  cursor: pointer;
+
+}
+
+
+/* =====================================
+   VOITTAJA-ANIMAATIO
+===================================== */
+
+.winner-enter {
+
+  animation:
+
+    winner-appear
+
+    0.8s
+
+    cubic-bezier(
+      0.2,
+      0.8,
+      0.2,
+      1
+    );
+
+}
+
+
+@keyframes winner-appear {
+
+  0% {
+
+    opacity: 0;
+
+    transform:
+
+      scale(0.7);
+
+  }
+
+
+  70% {
+
+    transform:
+
+      scale(1.04);
+
+  }
+
+
+  100% {
+
+    opacity: 1;
+
+    transform:
+
+      scale(1);
+
+  }
+
+}
+
+
+.box-winner
+.winner-icon {
+
+  animation:
+
+    box-float
+
+    3s
+
+    ease-in-out
+
+    infinite;
+
+}
+
+
+@keyframes box-float {
+
+  0% {
+
+    transform:
+
+      translateY(0)
+
+      rotate(-3deg);
+
+  }
+
+
+  50% {
+
+    transform:
+
+      translateY(-15px)
+
+      rotate(3deg);
+
+  }
+
+
+  100% {
+
+    transform:
+
+      translateY(0)
+
+      rotate(-3deg);
+
+  }
+
+}
+
+
+.tap-winner
+.winner-icon {
+
+  animation:
+
+    tap-glow
+
+    2s
+
+    ease-in-out
+
+    infinite;
+
+}
+
+
+@keyframes tap-glow {
+
+  0% {
+
+    transform:
+
+      scale(1);
+
+  }
+
+
+  50% {
+
+    transform:
+
+      scale(1.08);
+
+  }
+
+
+  100% {
+
+    transform:
+
+      scale(1);
+
+  }
+
+}
+
+
+/* =====================================
+   KONFETTI
+===================================== */
+
+.confetti-container {
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  overflow: hidden;
+
+}
+
+
+.confetti-piece {
+
+  position: absolute;
+
+  top: -20px;
+
+  width: 10px;
+
+  height: 18px;
+
+  animation:
+
+    confetti-fall
+
+    linear
+
+    infinite;
+
+}
+
+
+.box-confetti {
+
+  background: var(--gold);
+
+}
+
+
+.tap-confetti {
+
+  background: var(--blue-light);
+
+}
+
+
+@keyframes confetti-fall {
+
+  0% {
+
+    transform:
+
+      translateY(-30px)
+
+      rotate(0deg);
+
+    opacity: 1;
+
+  }
+
+
+  100% {
+
+    transform:
+
+      translateY(900px)
+
+      rotate(720deg);
+
+    opacity: 0;
+
+  }
+
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (
+
+  max-width: 1000px
+
+) {
+
+
+  .beer-grid {
+
+    grid-template-columns:
+
+      repeat(
+        4,
+        1fr
+      );
+
+  }
+
+
+  .results-columns {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+}
+
+
+/* =====================================
+   PUHELIN
+===================================== */
+
+@media (
+
+  max-width: 700px
+
+) {
+
+
+  .topbar {
+
+    padding: 12px;
+
+    min-height: auto;
+
+  }
+
+
+  .brand-name {
+
+    font-size: 24px;
+
+  }
+
+
+  .brand-subtitle {
+
+    display: none;
+
+  }
+
+
+  .live-results-button {
+
+    padding:
+
+      9px
+      12px;
+
+    font-size: 10px;
+
+  }
+
+
+  .beer-grid {
+
+    grid-template-columns:
+
+      repeat(
+        2,
+        1fr
+      );
+
+  }
+
+
+  .tap-grid {
+
+    grid-template-columns:
+
+      repeat(
+        2,
+        1fr
+      );
+
+  }
+
+
+  .beer-card {
+
+    min-height: 135px;
+
+    padding:
+
+      12px
+      7px;
+
+  }
+
+
+  .star-button {
+
+    font-size: 24px;
+
+  }
+
+
+  .results-category-header {
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    text-align: center;
+
+  }
+
 
   .podium {
-    grid-template-columns: 1fr;
+
+    padding: 8px;
+
   }
 
-  .result-row {
+
+  .podium-icon {
+
+    font-size: 34px;
+
+  }
+
+
+  .podium-beer-name {
+
+    font-size: 13px;
+
+  }
+
+
+  .podium-average {
+
+    font-size: 17px;
+
+  }
+
+
+  .ranking-row {
+
     grid-template-columns:
-      40px
+
+      25px
+      75px
       1fr
-      70px;
+      45px;
+
   }
 
-  .bar-container {
-    grid-column: 1 / -1;
+
+  .ranking-votes {
+
+    display: none;
+
   }
 
-  .votes {
-    grid-column: 1 / -1;
+
+  .winner-category {
+
+    padding:
+
+      8px
+      20px;
+
+    font-size: 14px;
+
   }
+
+
+  .winner-close {
+
+    top: 15px;
+
+    right: 20px;
+
+  }
+
 
 }
