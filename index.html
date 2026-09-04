@@ -2,6 +2,7 @@
 <html lang="fi">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -11,89 +12,139 @@
 
   <title>OMKRY Beer Tasting</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-<header class="header">
 
-  <div class="logo">
-    🍺 OMKRY
+<header class="topbar">
+
+  <div class="brand">
+
+    <span class="brand-icon">
+      🍺
+    </span>
+
+    <span class="brand-name">
+      OMKRY
+    </span>
+
+    <span class="brand-subtitle">
+      BEER TASTING
+    </span>
+
   </div>
 
-  <div class="subtitle">
-    BEER TASTING
-  </div>
+
+  <a
+    href="results.html"
+    class="live-results-button"
+  >
+    ◉ LIVE RESULTS
+  </a>
+
 
 </header>
 
 
-<main>
 
-  <section class="intro">
+<main class="voting-page">
 
-    <h1>Arvostele oluet</h1>
+
+  <section class="voting-intro">
+
+    <h1>
+      Arvostele oluet
+    </h1>
 
     <p>
       Anna jokaiselle oluelle pisteet asteikolla 1–5.
     </p>
 
-    <p class="small-text">
-      Voit muuttaa antamaasi arviota myöhemmin.
+    <p class="voting-help">
+      ☆ Harmaat tähdet = ei vielä arviota.
+      ★ Keltaiset tähdet = antamasi pisteet.
     </p>
 
   </section>
+
 
 
   <!-- LAATIKKO-OLUET -->
 
-  <section class="beer-section">
+  <section class="beer-category box-category">
 
-    <h2>
-      📦 Laatikkooluet
-    </h2>
 
-    <p class="category-info">
-      24 olutta – oma kilpailusarja
-    </p>
+    <div class="category-header">
+
+      <h2>
+
+        📦 LAATIKKOOLUET
+
+        <span>
+          (24 kpl)
+        </span>
+
+      </h2>
+
+    </div>
+
 
     <div
-      id="bottleBeers"
+      id="boxBeers"
       class="beer-grid"
     ></div>
 
+
   </section>
+
 
 
   <!-- HANAOLUET -->
 
-  <section class="beer-section tap-section">
+  <section class="beer-category tap-category">
 
-    <h2>
-      🍺 Hanaoluet
-    </h2>
 
-    <p class="category-info">
-      4 olutta – oma kilpailusarja
-    </p>
+    <div class="category-header">
+
+      <h2>
+
+        🍺 HANAOLUET
+
+        <span>
+          (4 kpl)
+        </span>
+
+      </h2>
+
+    </div>
+
 
     <div
       id="tapBeers"
-      class="beer-grid"
+      class="tap-grid"
     ></div>
+
 
   </section>
 
 
+
+  <p class="change-info">
+
+    ✓ Voit muuttaa antamaasi arviota milloin tahansa.
+
+  </p>
+
+
 </main>
 
-
-<footer>
-
-  🍺 OMKRY Beer Tasting
-
-</footer>
 
 
 <script
@@ -101,5 +152,7 @@
   src="app.js"
 ></script>
 
+
 </body>
+
 </html>
