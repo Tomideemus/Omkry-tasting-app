@@ -1,266 +1,541 @@
-import { database } from "./firebase-config.js";
+import {
+  database
+} from "./firebase-config.js";
+
 
 import {
+
   ref,
+
   set,
+
   get
-} from
-"https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
 
-// =================================
+
+
+// =====================================
 // OLUTLISTA
-// =================================
+// =====================================
 
 
 const beers = [
 
-  // =============================
+
   // 24 LAATIKKO-OLUTTA
-  // =============================
 
   ...Array.from(
-    { length: 24 },
+
+    {
+      length: 24
+    },
+
     (_, index) => ({
 
       id:
-        `box${String(index + 1).padStart(2, "0")}`,
+        `box${String(
+          index + 1
+        ).padStart(
+          2,
+          "0"
+        )}`,
 
       number:
         index + 1,
 
       name:
-        `Olut ${index + 1}`,
+        `OLUT ${index + 1}`,
 
       type:
         "box"
 
     })
+
   ),
 
 
-  // =============================
+
   // 4 HANAOLUTTA
-  // =============================
 
   ...Array.from(
-    { length: 4 },
+
+    {
+      length: 4
+    },
+
     (_, index) => ({
 
       id:
-        `tap${String(index + 1).padStart(2, "0")}`,
+        `tap${String(
+          index + 1
+        ).padStart(
+          2,
+          "0"
+        )}`,
 
       number:
         index + 1,
 
       name:
-        `Hana ${index + 1}`,
+        `HANA ${index + 1}`,
 
       type:
         "tap"
 
     })
+
   )
+
 
 ];
 
 
-// =================================
-// OSALLISTUJA ID
-// =================================
+
+
+// =====================================
+// LUO LAITEKOHTAINEN OSALLISTUJA-ID
+// =====================================
 
 
 let participantId =
+
   localStorage.getItem(
     "omkryParticipantId"
   );
 
 
+
 if (!participantId) {
+
 
   participantId =
     crypto.randomUUID();
 
 
   localStorage.setItem(
+
     "omkryParticipantId",
+
     participantId
+
   );
+
 
 }
 
 
-// =================================
+
+
+// =====================================
+// TÄHTIEN LUONTI
+// =====================================
+//
+// ALUKSI KAIKKI TÄHDET OVAT
+// HARMAITA JA TYHJIÄ ☆
+// =====================================
+
+
+function createStars(beer) {
+
+
+  return [1, 2, 3, 4, 5]
+
+    .map(score => `
+
+      <button
+
+        class="star-button"
+
+        data-beer="${beer.id}"
+
+        data-score="${score}"
+
+        aria-label="${score} pistettä"
+
+      >
+
+        ☆
+
+      </button>
+
+    `)
+
+    .join("");
+
+
+}
+
+
+
+
+// =====================================
 // OLUTKORTTI
-// =================================
+// =====================================
 
 
-function renderBeer(beer) {
+function createBeerCard(beer) {
+
+
+  const icon =
+
+    beer.type === "box"
+
+      ? "📦"
+
+      : "🍺";
+
+
 
   return `
 
-    <div class="beer-card">
 
-      <div class="beer-number">
+    <article
 
-        ${beer.type === "box"
-          ? "📦 Olut"
-          : "🍺 Hana"}
+      class="beer-card ${beer.type}-beer-card"
 
-        ${beer.number}
-
-      </div>
+    >
 
 
-      <div class="beer-name">
-
-        ${beer.name}
-
-      </div>
+      <div class="beer-card-title">
 
 
-      <div class="rating">
+        <span class="beer-small-icon">
 
-        ${[1, 2, 3, 4, 5]
-          .map(
-            score => `
+          ${icon}
 
-              <button
-                class="star"
-                data-beer="${beer.id}"
-                data-score="${score}"
-                aria-label="Anna ${score} pistettä"
-              >
-                ⭐
-              </button>
+        </span>
 
-            `
-          )
-          .join("")
-        }
+
+        <span>
+
+          ${beer.name}
+
+        </span>
+
 
       </div>
+
 
 
       <div
-        class="rating-text"
+
+        class="rating"
+
         id="rating-${beer.id}"
+
+      >
+
+
+        ${createStars(beer)}
+
+
+      </div>
+
+
+
+      <div class="score-numbers">
+
+
+        <span>1</span>
+
+        <span>2</span>
+
+        <span>3</span>
+
+        <span>4</span>
+
+        <span>5</span>
+
+
+      </div>
+
+
+
+      <div
+
+        class="save-status"
+
+        id="status-${beer.id}"
+
       >
 
         Ei vielä arvosteltu
 
       </div>
 
-    </div>
+
+    </article>
+
 
   `;
+
 
 }
 
 
-// =================================
-// RENDERÖI OLUTLISTAT
-// =================================
+
+
+// =====================================
+// RENDERÖI OLUET
+// =====================================
 
 
 function renderBeers() {
 
 
   const boxBeers =
+
     beers.filter(
-      beer =>
-        beer.type === "box"
+
+      beer => beer.type === "box"
+
     );
+
 
 
   const tapBeers =
+
     beers.filter(
-      beer =>
-        beer.type === "tap"
+
+      beer => beer.type === "tap"
+
     );
 
 
+
   document
-    .getElementById(
-      "bottleBeers"
-    )
+    .getElementById("boxBeers")
     .innerHTML =
 
     boxBeers
-      .map(renderBeer)
+
+      .map(createBeerCard)
+
       .join("");
+
 
 
   document
-    .getElementById(
-      "tapBeers"
-    )
+    .getElementById("tapBeers")
     .innerHTML =
 
     tapBeers
-      .map(renderBeer)
+
+      .map(createBeerCard)
+
       .join("");
 
 
-  loadUserRatings();
+
+  loadSavedRatings();
+
 
 }
 
 
-// =================================
-// TALLENNA ÄÄNI
-// =================================
 
 
-async function vote(
+// =====================================
+// PÄIVITÄ TÄHTIEN ULKOASU
+// =====================================
+//
+// VAIN ANNETUT PISTEET
+// MUUTTUVAT KELTAISIKSI ★
+// =====================================
+
+
+function updateStars(
+
   beerId,
+
   score
+
 ) {
+
+
+  const buttons =
+
+    document.querySelectorAll(
+
+      `[data-beer="${beerId}"]`
+
+    );
+
+
+
+  buttons.forEach(button => {
+
+
+    const buttonScore =
+
+      Number(
+
+        button.dataset.score
+
+      );
+
+
+
+    // VALITTU TÄHTI
+
+
+    if (buttonScore <= score) {
+
+
+      button.classList.add(
+        "selected"
+      );
+
+
+      // Täytetty tähti
+
+      button.textContent =
+        "★";
+
+
+    }
+
+
+    // EI VALITTU TÄHTI
+
+
+    else {
+
+
+      button.classList.remove(
+        "selected"
+      );
+
+
+      // Tyhjä tähti
+
+      button.textContent =
+        "☆";
+
+
+    }
+
+
+  });
+
+
+}
+
+
+
+
+// =====================================
+// TALLENNA ÄÄNI FIREBASEEN
+// =====================================
+
+
+async function saveVote(
+
+  beerId,
+
+  score
+
+) {
+
+
+  const status =
+
+    document.getElementById(
+
+      `status-${beerId}`
+
+    );
+
+
+
+  status.textContent =
+
+    "Tallennetaan...";
+
 
 
   try {
 
-    const voteRef =
+
+    const voteReference =
+
       ref(
+
         database,
+
         `votes/${beerId}/${participantId}`
+
       );
 
 
+
     await set(
-      voteRef,
+
+      voteReference,
+
       {
-        score: score,
-        updatedAt: Date.now()
+
+        score:
+          score,
+
+
+        updatedAt:
+          Date.now()
+
       }
+
     );
 
 
-    document
-      .getElementById(
-        `rating-${beerId}`
-      )
-      .innerHTML =
+
+    // PÄIVITÄ TÄHDET VASTA,
+    // KUN ÄÄNI ON TALLENNETTU
+
+
+    updateStars(
+
+      beerId,
+
+      score
+
+    );
+
+
+
+    status.innerHTML =
 
       `
-        Oma arviosi:
 
-        <strong>
-          ${score} / 5 ⭐
-        </strong>
+        <span class="saved-check">
+
+          ✓
+
+        </span>
+
+        Tallennettu
+
+        ·
+
+        ${score}/5
+
       `;
 
 
   }
 
+
   catch (error) {
+
 
     console.error(error);
 
 
-    alert(
-      "Äänen tallentaminen epäonnistui. Tarkista internet-yhteys."
-    );
+    status.textContent =
+
+      "Tallennus epäonnistui";
+
 
   }
 
@@ -268,94 +543,170 @@ async function vote(
 }
 
 
-// =================================
-// ÄÄNESTYSNAPIT
-// =================================
+
+
+// =====================================
+// TÄHDEN KLIKKAUS
+// =====================================
 
 
 document.addEventListener(
+
   "click",
+
   event => {
 
 
-    if (
-      event.target.classList.contains(
-        "star"
-      )
-    ) {
+    const button =
 
+      event.target.closest(
 
-      const beerId =
-        event.target.dataset.beer;
+        ".star-button"
 
-
-      const score =
-        Number(
-          event.target.dataset.score
-        );
-
-
-      vote(
-        beerId,
-        score
       );
+
+
+
+    if (!button) {
+
+
+      return;
 
 
     }
 
 
+
+    const beerId =
+
+      button.dataset.beer;
+
+
+
+    const score =
+
+      Number(
+
+        button.dataset.score
+
+      );
+
+
+
+    saveVote(
+
+      beerId,
+
+      score
+
+    );
+
+
   }
+
 );
 
 
-// =================================
-// LATAA AIEMMAT ÄÄNET
-// =================================
 
 
-async function loadUserRatings() {
+// =====================================
+// LATAA AIEMMIN TALLENNETUT ARVIOT
+// =====================================
 
 
-  for (
-    const beer of beers
-  ) {
+async function loadSavedRatings() {
 
 
-    const voteRef =
-      ref(
-        database,
-        `votes/${beer.id}/${participantId}`
-      );
+  for (const beer of beers) {
 
 
-    const snapshot =
-      await get(
-        voteRef
-      );
+    try {
 
 
-    if (
-      snapshot.exists()
-    ) {
+      const voteReference =
+
+        ref(
+
+          database,
+
+          `votes/${beer.id}/${participantId}`
+
+        );
 
 
-      const data =
-        snapshot.val();
+
+      const snapshot =
+
+        await get(
+
+          voteReference
+
+        );
 
 
-      document
-        .getElementById(
-          `rating-${beer.id}`
-        )
-        .innerHTML =
 
-        `
-          Oma arviosi:
+      if (snapshot.exists()) {
 
-          <strong>
-            ${data.score} / 5 ⭐
-          </strong>
-        `;
+
+        const vote =
+
+          snapshot.val();
+
+
+
+        // NÄYTÄ AIEMMIN ANNETUT
+        // KELTAISET TÄHDET
+
+
+        updateStars(
+
+          beer.id,
+
+          vote.score
+
+        );
+
+
+
+        const status =
+
+          document.getElementById(
+
+            `status-${beer.id}`
+
+          );
+
+
+
+        status.innerHTML =
+
+          `
+
+            <span class="saved-check">
+
+              ✓
+
+            </span>
+
+            Tallennettu
+
+            ·
+
+            ${vote.score}/5
+
+          `;
+
+
+      }
+
+
+    }
+
+
+    catch (error) {
+
+
+      console.error(error);
 
 
     }
@@ -367,9 +718,11 @@ async function loadUserRatings() {
 }
 
 
-// =================================
-// KÄYNNISTÄ SOVELLUS
-// =================================
+
+
+// =====================================
+// KÄYNNISTYS
+// =====================================
 
 
 renderBeers();
