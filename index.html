@@ -1,158 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fi">
-
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>OMKRY Beer Tasting</title>
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0c0d">
+<title>OMKRY Beer Tasting</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
-
 <header class="topbar">
-
   <div class="brand">
-
-    <span class="brand-icon">
-      🍺
-    </span>
-
-    <span class="brand-name">
-      OMKRY
-    </span>
-
-    <span class="brand-subtitle">
-      BEER TASTING
-    </span>
-
+    <span class="brand-icon">🍺</span>
+    <div>
+      <strong>OMKRY</strong>
+      <small>BEER TASTING</small>
+    </div>
   </div>
 
-
-  <a
-    href="results.html"
-    class="live-results-button"
-  >
-    ◉ LIVE RESULTS
+  <a class="top-link" href="results.html">
+    📊 Tulokset
   </a>
-
-
 </header>
 
+<main class="container">
 
-
-<main class="voting-page">
-
-
-  <section class="voting-intro">
-
-    <h1>
-      Arvostele oluet
-    </h1>
-
-    <p>
-      Anna jokaiselle oluelle pisteet asteikolla 1–5.
-    </p>
-
-    <p class="voting-help">
-      ☆ Harmaat tähdet = ei vielä arviota.
-      ★ Keltaiset tähdet = antamasi pisteet.
-    </p>
-
-  </section>
-
-
-
-  <!-- LAATIKKO-OLUET -->
-
-  <section class="beer-category box-category">
-
-
-    <div class="category-header">
-
-      <h2>
-
-        📦 LAATIKKOOLUET
-
-        <span>
-          (24 kpl)
-        </span>
-
-      </h2>
-
+  <section class="hero">
+    <div>
+      <p class="eyebrow">OLUTTASTING</p>
+      <h1>Arvostele oluet</h1>
+      <p>
+        Anna jokaiselle oluelle pisteet 1–5.
+        Harmaat tähdet tarkoittavat, ettei olutta ole vielä arvioitu.
+      </p>
     </div>
 
-
-    <div
-      id="boxBeers"
-      class="beer-grid"
-    ></div>
-
-
+    <div class="live-pill">
+      <i></i> LIVE
+    </div>
   </section>
 
+  <div id="loading" class="notice">
+    Ladataan oluita…
+  </div>
 
+  <div id="error" class="notice error hidden"></div>
 
-  <!-- HANAOLUET -->
+  <section id="boxSection" class="category box-category hidden">
 
-  <section class="beer-category tap-category">
-
-
-    <div class="category-header">
-
-      <h2>
-
-        🍺 HANAOLUET
-
-        <span>
-          (4 kpl)
-        </span>
-
-      </h2>
-
+    <div class="section-title">
+      <span>📦</span>
+      <div>
+        <h2>Laatikko-oluet</h2>
+        <small id="boxCount"></small>
+      </div>
     </div>
 
-
-    <div
-      id="tapBeers"
-      class="tap-grid"
-    ></div>
-
+    <div id="boxBeers" class="beer-grid"></div>
 
   </section>
 
+  <section id="tapSection" class="category tap-category hidden">
 
+    <div class="section-title">
+      <span>🍺</span>
+      <div>
+        <h2>Hanaoluet</h2>
+        <small id="tapCount"></small>
+      </div>
+    </div>
 
-  <p class="change-info">
+    <div id="tapBeers" class="beer-grid"></div>
 
-    ✓ Voit muuttaa antamaasi arviota milloin tahansa.
+  </section>
 
-  </p>
-
+  <div id="emptyState" class="notice hidden">
+    Oluita ei ole vielä lisätty.
+    <a href="admin.html">Lisää oluet ylläpidosta</a>.
+  </div>
 
 </main>
 
+<div id="toast" class="toast"></div>
 
-
-<script
-  type="module"
-  src="app.js"
-></script>
-
+<script type="module" src="app.js"></script>
 
 </body>
-
 </html>
