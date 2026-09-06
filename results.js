@@ -1,1417 +1,404 @@
 import {
+  ref,
+  onValue
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+import {
   database
 } from "./firebase-config.js";
 
 
-import {
-
-  ref,
-
-  onValue
-
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+const $ =
+  id => document.getElementById(id);
 
 
+let beers = [];
+let votes = {};
 
 
-// =====================================
-// OLUTLISTA
-// =====================================
-
-
-const beers = [
-
-
-  ...Array.from(
-
-    {
-      length: 24
-    },
-
-    (_, index) => ({
-
-      id:
-        `box${String(
-          index + 1
-        ).padStart(
-          2,
-          "0"
-        )}`,
-
-      name:
-        `OLUT ${index + 1}`,
-
-      type:
-        "box"
-
-    })
-
-  ),
-
-
-
-  ...Array.from(
-
-    {
-      length: 4
-    },
-
-    (_, index) => ({
-
-      id:
-        `tap${String(
-          index + 1
-        ).padStart(
-          2,
-          "0"
-        )}`,
-
-      name:
-        `HANA ${index + 1}`,
-
-      type:
-        "tap"
-
-    })
-
-  )
-
-
-];
-
-
-
-let currentBoxResults = [];
-
-let currentTapResults = [];
-
-let winnerSequence = [];
-
-
-
-
-// =====================================
-// FIREBASE LIVE-KUUNTELU
-// =====================================
-
-
-const votesReference =
-
-  ref(
-
-    database,
-
-    "votes"
-
+const esc = value =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[char])
   );
 
 
+function calculate() {
 
-onValue(
+  return beers
+    .map(beer => {
 
-  votesReference,
-
-  snapshot => {
-
-
-    const votes =
-
-      snapshot.val()
-
-      ||
-
-      {};
-
-
-
-    const results =
-
-      calculateResults(votes);
-
-
-
-    currentBoxResults =
-
-      results
-
-        .filter(
-
-          beer =>
-
-            beer.type === "box"
-
-        )
-
-        .sort(sortResults);
-
-
-
-    currentTapResults =
-
-      results
-
-        .filter(
-
-          beer =>
-
-            beer.type === "tap"
-
-        )
-
-        .sort(sortResults);
-
-
-
-    renderCategory(
-
-      currentBoxResults,
-
-      "box"
-
-    );
-
-
-
-    renderCategory(
-
-      currentTapResults,
-
-      "tap"
-
-    );
-
-
-  }
-
-);
-
-
-
-
-// =====================================
-// LASKE TULOKSET
-// =====================================
-
-
-function calculateResults(votes) {
-
-
-  return beers.map(beer => {
-
-
-    const beerVotes =
-
-      votes[beer.id]
-
-        ?
-
+      const vals =
         Object.values(
-
-          votes[beer.id]
-
+          votes[beer.id] || {}
         )
-
-        :
-
-        [];
-
-
-
-    const scores =
-
-      beerVotes
-
         .map(
-
           vote =>
-
-            Number(vote.score)
-
+            Number(
+              vote?.score
+            )
         )
-
         .filter(
-
-          score =>
-
-            score >= 1
-
-            &&
-
-            score <= 5
-
+          value =>
+            value >= 1 &&
+            value <= 5
         );
 
 
-
-    const voteCount =
-
-      scores.length;
-
-
-
-    const average =
-
-      voteCount > 0
-
-        ?
-
-        scores.reduce(
-
-          (total, score) =>
-
-            total + score,
-
+      const total =
+        vals.reduce(
+          (a,b) => a + b,
           0
-
-        )
-
-        /
-
-        voteCount
-
-        :
-
-        0;
+        );
 
 
+      return {
+        ...beer,
+        count: vals.length,
+        average:
+          vals.length
+            ? total / vals.length
+            : 0
+      };
 
-    return {
-
-      ...beer,
-
-      average,
-
-      voteCount
-
-    };
-
-
-  });
-
+    })
+    .sort(
+      (a,b) =>
+        b.average - a.average ||
+        b.count - a.count ||
+        (a.order ?? 999) -
+        (b.order ?? 999)
+    );
 
 }
 
 
-
-
-// =====================================
-// JÄRJESTÄ TULOKSET
-// =====================================
-
-
-function sortResults(a, b) {
-
-
-  if (
-
-    b.average !== a.average
-
-  ) {
-
-
-    return (
-
-      b.average -
-
-      a.average
-
-    );
-
-
-  }
-
-
-
-  return (
-
-    b.voteCount -
-
-    a.voteCount
-
-  );
-
-
-}
-
-
-
-
-// =====================================
-// RENDERÖI KATEGORIA
-// =====================================
-
-
-function renderCategory(
-
-  results,
-
-  category
-
-) {
-
-
-  const votedBeers =
-
-    results.filter(
-
-      beer =>
-
-        beer.voteCount > 0
-
-    );
-
-
-
-  const totalVotes =
-
-    results.reduce(
-
-      (total, beer) =>
-
-        total + beer.voteCount,
-
-      0
-
-    );
-
-
-
-  document
-
-    .getElementById(
-
-      `${category}VoteCount`
-
-    )
-
-    .textContent =
-
-      `Yhteensä ääniä: ${totalVotes}`;
-
-
-
-  renderPodium(
-
-    votedBeers,
-
-    category
-
-  );
-
-
-
-  renderRanking(
-
-    votedBeers,
-
-    category
-
-  );
-
-
-}
-
-
-
-
-// =====================================
-// TOP 3 PODIUM
-// =====================================
-
-
-function renderPodium(
-
-  results,
-
-  category
-
-) {
-
-
-  const podium =
-
-    document.getElementById(
-
-      `${category}Podium`
-
-    );
-
-
-
-  if (
-
-    results.length === 0
-
-  ) {
-
-
-    podium.innerHTML =
-
-      `
-
-        <div class="no-results">
-
-          Ei vielä ääniä
-
-        </div>
-
-      `;
-
-
-    return;
-
-
-  }
-
-
-
-  const topThree =
-
-    results.slice(
-
-      0,
-
-      3
-
-    );
-
-
-
-  const podiumOrder =
-
-    [
-
-      1,
-
-      0,
-
-      2
-
-    ];
-
-
-
-  const medals =
-
-    [
-
-      "🥇",
-
-      "🥈",
-
-      "🥉"
-
-    ];
-
-
-
-  podium.innerHTML =
-
-    podiumOrder
-
-      .map(resultIndex => {
-
-
-        const beer =
-
-          topThree[resultIndex];
-
-
-
-        if (!beer) {
-
-
-          return `
-
-            <div class="podium-place empty">
-
-            </div>
-
-          `;
-
-
-        }
-
-
-
-        const place =
-
-          resultIndex + 1;
-
-
-
-        return `
-
-
-          <div
-
-            class="podium-place place-${place}"
-
-          >
-
-
-            <div class="podium-medal">
-
-              ${medals[resultIndex]}
-
-            </div>
-
-
-
-            <div class="podium-icon">
-
-              ${category === "box"
-
-                ? "📦"
-
+function podiumHTML(items) {
+
+  return items
+    .slice(0,3)
+    .map(
+      (b,i) => `
+
+        <button
+          class="podium-item rank-${i+1}"
+          data-winner="${esc(b.id)}"
+        >
+
+          <div class="rank">
+            ${i+1}
+          </div>
+
+
+          <div class="result-photo">
+
+            ${
+              b.image
+                ? `<img
+                    src="${esc(b.image)}"
+                    alt=""
+                  >`
                 : "🍺"
-
-              }
-
-            </div>
-
-
-
-            <div class="podium-beer-name">
-
-              ${beer.name}
-
-            </div>
-
-
-
-            <div class="podium-average">
-
-              ${beer.average.toFixed(2)}
-
-              ★
-
-            </div>
-
-
-
-            <div class="podium-votes">
-
-              ${beer.voteCount}
-
-              ääntä
-
-            </div>
-
+            }
 
           </div>
 
 
-        `;
+          <div class="result-number">
+            ${esc(
+              b.number || b.id
+            )}
+          </div>
 
 
-      })
+          <strong>
+            ${esc(b.name)}
+          </strong>
 
-      .join("");
 
+          <span>
+            ${b.average.toFixed(2)} ★
+          </span>
+
+
+          <small>
+            ${b.count} ääntä
+          </small>
+
+        </button>
+
+      `
+    )
+    .join("");
 
 }
 
 
+function rankingHTML(items) {
+
+  return items
+    .slice(3)
+    .map(
+      (b,i) => `
+
+        <div class="rank-row">
+
+          <span class="rank-num">
+            ${i+4}.
+          </span>
 
 
-// =====================================
-// RANKING-LISTA
-// =====================================
+          <div class="rank-name">
+
+            <strong>
+              ${esc(
+                b.number || b.id
+              )}
+            </strong>
+
+            <span>
+              ${esc(b.name)}
+            </span>
+
+          </div>
 
 
-function renderRanking(
+          <div class="bar">
 
-  results,
+            <i
+              style="width:${Math.max(
+                4,
+                b.average / 5 * 100
+              )}%"
+            ></i>
 
-  category
-
-) {
-
-
-  const ranking =
-
-    document.getElementById(
-
-      `${category}Ranking`
-
-    );
+          </div>
 
 
-
-  const displayResults =
-
-    results.slice(
-
-      3,
-
-      10
-
-    );
+          <strong>
+            ${b.average.toFixed(2)} ★
+          </strong>
 
 
-
-  if (
-
-    displayResults.length === 0
-
-  ) {
-
-
-    ranking.innerHTML =
-
-      `
-
-        <div class="no-results-small">
-
-          Odotetaan lisää arvioita...
+          <small>
+            ${b.count}
+          </small>
 
         </div>
 
-      `;
-
-
-    return;
-
-
-  }
-
-
-
-  ranking.innerHTML =
-
-    displayResults
-
-      .map(
-
-        (beer, index) => {
-
-
-          const rank =
-
-            index + 4;
-
-
-
-          const width =
-
-            beer.average * 20;
-
-
-
-          return `
-
-
-            <div class="ranking-row">
-
-
-              <div class="ranking-position">
-
-                ${rank}.
-
-              </div>
-
-
-
-              <div class="ranking-name">
-
-                ${beer.name}
-
-              </div>
-
-
-
-              <div class="ranking-bar-background">
-
-
-                <div
-
-                  class="ranking-bar ${category}-bar"
-
-                  style="width: ${width}%"
-
-                ></div>
-
-
-              </div>
-
-
-
-              <div class="ranking-score">
-
-                ${beer.average.toFixed(2)}
-
-              </div>
-
-
-
-              <div class="ranking-votes">
-
-                ${beer.voteCount}
-
-              </div>
-
-
-            </div>
-
-
-          `;
-
-
-        }
-
-      )
-
-      .join("");
-
+      `
+    )
+    .join("");
 
 }
 
 
+function render() {
+
+  const all =
+    calculate();
 
 
-// =====================================
-// VOITTAJA-ANIMAATIO
-// =====================================
-
-
-const modal =
-
-  document.getElementById(
-
-    "winnerModal"
-
-  );
-
-
-const winnerCategory =
-
-  document.getElementById(
-
-    "winnerCategory"
-
-  );
-
-
-const winnerIcon =
-
-  document.getElementById(
-
-    "winnerIcon"
-
-  );
-
-
-const winnerName =
-
-  document.getElementById(
-
-    "winnerName"
-
-  );
-
-
-const winnerScore =
-
-  document.getElementById(
-
-    "winnerScore"
-
-  );
-
-
-const winnerVotes =
-
-  document.getElementById(
-
-    "winnerVotes"
-
-  );
-
-
-const winnerNextButton =
-
-  document.getElementById(
-
-    "winnerNextButton"
-
-  );
-
-
-const winnerContent =
-
-  document.getElementById(
-
-    "winnerContent"
-
-  );
-
-
-
-
-function showWinner(
-
-  beer,
-
-  category,
-
-  hasNext = false
-
-) {
-
-
-  if (!beer) {
-
-
-    alert(
-
-      "Tässä kategoriassa ei ole vielä ääniä."
-
+  const box =
+    all.filter(
+      b => b.category === "box"
     );
 
 
-    return;
-
-
-  }
-
-
-
-  modal.classList.add(
-
-    "active"
-
-  );
-
-
-
-  winnerContent.classList.remove(
-
-    "box-winner",
-
-    "tap-winner",
-
-    "winner-enter"
-
-  );
-
-
-
-  void winnerContent.offsetWidth;
-
-
-
-  winnerContent.classList.add(
-
-    category === "box"
-
-      ?
-
-      "box-winner"
-
-      :
-
-      "tap-winner"
-
-  );
-
-
-
-  winnerContent.classList.add(
-
-    "winner-enter"
-
-  );
-
-
-
-  winnerCategory.textContent =
-
-    category === "box"
-
-      ?
-
-      "📦 LAATIKKOOLUET"
-
-      :
-
-      "🍺 HANAOLUET";
-
-
-
-  winnerIcon.textContent =
-
-    category === "box"
-
-      ?
-
-      "📦"
-
-      :
-
-      "🍺";
-
-
-
-  winnerName.textContent =
-
-    beer.name;
-
-
-
-  winnerScore.innerHTML =
-
-    `${beer.average.toFixed(2)} ★`;
-
-
-
-  winnerVotes.textContent =
-
-    `${beer.voteCount} ääntä`;
-
-
-
-  winnerNextButton.textContent =
-
-    hasNext
-
-      ?
-
-      "SEURAAVA VOITTAJA →"
-
-      :
-
-      "SULJE";
-
-
-
-  createConfetti(category);
-
-
-}
-
-
-
-
-// =====================================
-// KONFETTI
-// =====================================
-
-
-function createConfetti(category) {
-
-
-  const container =
-
-    document.getElementById(
-
-      "confetti"
-
+  const tap =
+    all.filter(
+      b => b.category === "tap"
     );
 
 
-
-  container.innerHTML =
-
-    "";
-
-
-
-  for (
-
-    let i = 0;
-
-    i < 70;
-
-    i++
-
-  ) {
+  $("boxPodium").innerHTML =
+    box.length
+      ? podiumHTML(box)
+      : `<div class="notice">
+          Ei vielä tuloksia.
+        </div>`;
 
 
-    const piece =
+  $("tapPodium").innerHTML =
+    tap.length
+      ? podiumHTML(tap)
+      : `<div class="notice">
+          Ei vielä tuloksia.
+        </div>`;
 
-      document.createElement(
 
-        "div"
+  $("boxRanking").innerHTML =
+    rankingHTML(box);
 
+
+  $("tapRanking").innerHTML =
+    rankingHTML(tap);
+
+
+  $("boxVotes").textContent =
+    `${box.reduce(
+      (sum,b) =>
+        sum + b.count,
+      0
+    )} ääntä`;
+
+
+  $("tapVotes").textContent =
+    `${tap.reduce(
+      (sum,b) =>
+        sum + b.count,
+      0
+    )} ääntä`;
+
+}
+
+
+function showWinner(id) {
+
+  const b =
+    calculate()
+      .find(
+        x => x.id === id
       );
 
 
-
-    piece.className =
-
-      `confetti-piece ${category}-confetti`;
-
-
-
-    piece.style.left =
-
-      `${Math.random() * 100}%`;
-
-
-
-    piece.style.animationDelay =
-
-      `${Math.random() * 1.5}s`;
-
-
-
-    piece.style.animationDuration =
-
-      `${2 + Math.random() * 2}s`;
-
-
-
-    container.appendChild(piece);
-
-
+  if (!b) {
+    return;
   }
 
 
+  $("winnerCard").className =
+    `winner-card ${
+      b.category === "tap"
+        ? "tap-winner"
+        : "box-winner"
+    }`;
+
+
+  $("winnerCategory").textContent =
+    b.category === "tap"
+      ? "HANAVOITTAJA"
+      : "LAATIKKOVOITTAJA";
+
+
+  $("winnerNumber").textContent =
+    b.number || b.id;
+
+
+  $("winnerName").textContent =
+    b.name;
+
+
+  $("winnerScore").textContent =
+    `${b.average.toFixed(2)} ★`;
+
+
+  $("winnerVotes").textContent =
+    `${b.count} ääntä`;
+
+
+  $("winnerImage").innerHTML =
+    b.image
+      ? `<img
+          src="${esc(b.image)}"
+          alt=""
+        >`
+      : "🍺";
+
+
+  $("winnerConfetti").innerHTML =
+    Array.from(
+      {length:28},
+      (_,i) =>
+        `<i style="--i:${i}">
+          ✦
+        </i>`
+    ).join("");
+
+
+  $("winnerModal")
+    .classList
+    .remove("hidden");
+
 }
-
-
-
-
-// =====================================
-// SULJE VOITTAJA
-// =====================================
-
-
-function closeWinner() {
-
-
-  modal.classList.remove(
-
-    "active"
-
-  );
-
-
-  winnerSequence = [];
-
-
-}
-
-
-
-
-document
-
-  .getElementById(
-
-    "closeWinner"
-
-  )
-
-  .addEventListener(
-
-    "click",
-
-    closeWinner
-
-  );
-
-
-
-
-// =====================================
-// LAATIKKOVOITTAJA
-// =====================================
-
-
-document
-
-  .getElementById(
-
-    "showBoxWinner"
-
-  )
-
-  .addEventListener(
-
-    "click",
-
-    () => {
-
-
-      const winner =
-
-        currentBoxResults.find(
-
-          beer =>
-
-            beer.voteCount > 0
-
-        );
-
-
-
-      showWinner(
-
-        winner,
-
-        "box"
-
-      );
-
-
-    }
-
-  );
-
-
-
-
-// =====================================
-// HANAVOITTAJA
-// =====================================
-
-
-document
-
-  .getElementById(
-
-    "showTapWinner"
-
-  )
-
-  .addEventListener(
-
-    "click",
-
-    () => {
-
-
-      const winner =
-
-        currentTapResults.find(
-
-          beer =>
-
-            beer.voteCount > 0
-
-        );
-
-
-
-      showWinner(
-
-        winner,
-
-        "tap"
-
-      );
-
-
-    }
-
-  );
-
-
-
-
-// =====================================
-// MOLEMMAT VOITTAJAT
-// =====================================
-
-
-document
-
-  .getElementById(
-
-    "showBothWinners"
-
-  )
-
-  .addEventListener(
-
-    "click",
-
-    () => {
-
-
-      const boxWinner =
-
-        currentBoxResults.find(
-
-          beer =>
-
-            beer.voteCount > 0
-
-        );
-
-
-
-      const tapWinner =
-
-        currentTapResults.find(
-
-          beer =>
-
-            beer.voteCount > 0
-
-        );
-
-
-
-      if (
-
-        !boxWinner
-
-        ||
-
-        !tapWinner
-
-      ) {
-
-
-        alert(
-
-          "Molemmissa kategorioissa täytyy olla vähintään yksi arvio."
-
-        );
-
-
-        return;
-
-
-      }
-
-
-
-      winnerSequence = [
-
-        {
-
-          beer:
-            boxWinner,
-
-          category:
-            "box"
-
-        },
-
-        {
-
-          beer:
-            tapWinner,
-
-          category:
-            "tap"
-
-        }
-
-      ];
-
-
-
-      const first =
-
-        winnerSequence.shift();
-
-
-
-      showWinner(
-
-        first.beer,
-
-        first.category,
-
-        true
-
-      );
-
-
-    }
-
-  );
-
-
-
-
-// =====================================
-// SEURAAVA VOITTAJA
-// =====================================
-
-
-winnerNextButton
-
-  .addEventListener(
-
-    "click",
-
-    () => {
-
-
-      if (
-
-        winnerSequence.length > 0
-
-      ) {
-
-
-        const nextWinner =
-
-          winnerSequence.shift();
-
-
-
-        showWinner(
-
-          nextWinner.beer,
-
-          nextWinner.category,
-
-          false
-
-        );
-
-
-      }
-
-
-      else {
-
-
-        closeWinner();
-
-
-      }
-
-
-    }
-
-  );
-
-
-
-
-// =====================================
-// ESC
-// =====================================
 
 
 document.addEventListener(
-
-  "keydown",
-
+  "click",
   event => {
 
-
-    if (
-
-      event.key === "Escape"
-
-    ) {
+    const item =
+      event.target.closest(
+        "[data-winner]"
+      );
 
 
-      closeWinner();
+    if (item) {
 
+      showWinner(
+        item.dataset.winner
+      );
 
     }
 
 
-  }
+    if (
+      event.target.id ===
+        "closeWinner" ||
+      event.target.classList.contains(
+        "modal-backdrop"
+      )
+    ) {
 
+      $("winnerModal")
+        .classList
+        .add("hidden");
+
+    }
+
+  }
+);
+
+
+onValue(
+  ref(database, "beers"),
+  snapshot => {
+
+    const data =
+      snapshot.val() || {};
+
+
+    beers =
+      Object.entries(data)
+        .map(
+          ([id,value]) => ({
+            id,
+            ...value
+          })
+        );
+
+
+    render();
+
+  }
+);
+
+
+onValue(
+  ref(database, "votes"),
+  snapshot => {
+
+    votes =
+      snapshot.val() || {};
+
+
+    render();
+
+  }
 );
