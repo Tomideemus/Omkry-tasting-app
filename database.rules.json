@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "beers": {
+      ".read": "auth != null",
+      "$beerId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+        ".validate": "newData.hasChildren(['name','category','number','order','image']) && newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 80 && (newData.child('category').val() === 'box' || newData.child('category').val() === 'tap')"
+      }
+    },
+
+    "votes": {
+      ".read": "auth != null",
+
+      "$beerId": {
+
+        "$uid": {
+
+          ".write": "auth != null && auth.uid === $uid",
+
+          ".validate": "newData.hasChildren(['score','updatedAt']) && newData.child('score').isNumber() && newData.child('score').val() >= 1 && newData.child('score').val() <= 5"
+
+        }
+
+      }
+
+    },
+
+    "users": {
+
+      "$uid": {
+
+        ".read": "auth != null && auth.uid === $uid",
+
+        ".write": "auth != null && auth.uid === $uid && !data.exists()"
+
+      }
+
+    }
+
+  }
+
+}
