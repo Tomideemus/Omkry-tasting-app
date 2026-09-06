@@ -1,728 +1,397 @@
 import {
-  database
+  ref,
+  onValue,
+  set,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+import {
+  signInAnonymously,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+import {
+  database,
+  auth
 } from "./firebase-config.js";
 
 
-import {
+const $ = id => document.getElementById(id);
 
-  ref,
-
-  set,
-
-  get
-
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+let currentUid = null;
+let beers = [];
+let myVotes = {};
 
 
-
-
-// =====================================
-// OLUTLISTA
-// =====================================
-
-
-const beers = [
-
-
-  // 24 LAATIKKO-OLUTTA
-
-  ...Array.from(
-
-    {
-      length: 24
-    },
-
-    (_, index) => ({
-
-      id:
-        `box${String(
-          index + 1
-        ).padStart(
-          2,
-          "0"
-        )}`,
-
-      number:
-        index + 1,
-
-      name:
-        `OLUT ${index + 1}`,
-
-      type:
-        "box"
-
-    })
-
-  ),
-
-
-
-  // 4 HANAOLUTTA
-
-  ...Array.from(
-
-    {
-      length: 4
-    },
-
-    (_, index) => ({
-
-      id:
-        `tap${String(
-          index + 1
-        ).padStart(
-          2,
-          "0"
-        )}`,
-
-      number:
-        index + 1,
-
-      name:
-        `HANA ${index + 1}`,
-
-      type:
-        "tap"
-
-    })
-
-  )
-
-
-];
-
-
-
-
-// =====================================
-// LUO LAITEKOHTAINEN OSALLISTUJA-ID
-// =====================================
-
-
-let participantId =
-
-  localStorage.getItem(
-    "omkryParticipantId"
+const esc = value =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[char])
   );
 
 
+function toast(text) {
 
-if (!participantId) {
+  const el = $("toast");
 
+  el.textContent = text;
 
-  participantId =
-    crypto.randomUUID();
+  el.classList.add("show");
 
-
-  localStorage.setItem(
-
-    "omkryParticipantId",
-
-    participantId
-
-  );
-
+  setTimeout(() => {
+    el.classList.remove("show");
+  }, 2200);
 
 }
 
 
+function createCard(beer) {
+
+  const score = myVotes[beer.id] ?? 0;
 
 
-// =====================================
-// TÄHTIEN LUONTI
-// =====================================
-//
-// ALUKSI KAIKKI TÄHDET OVAT
-// HARMAITA JA TYHJIÄ ☆
-// =====================================
-
-
-function createStars(beer) {
-
-
-  return [1, 2, 3, 4, 5]
-
-    .map(score => `
-
-      <button
-
-        class="star-button"
-
-        data-beer="${beer.id}"
-
-        data-score="${score}"
-
-        aria-label="${score} pistettä"
-
-      >
-
-        ☆
-
-      </button>
-
-    `)
-
-    .join("");
-
-
-}
-
-
-
-
-// =====================================
-// OLUTKORTTI
-// =====================================
-
-
-function createBeerCard(beer) {
-
-
-  const icon =
-
-    beer.type === "box"
-
-      ? "📦"
-
-      : "🍺";
-
+  const image = beer.image
+    ? `<img
+        class="beer-image"
+        src="${esc(beer.image)}"
+        alt=""
+        loading="lazy"
+      >`
+    : `<div class="beer-placeholder">🍺</div>`;
 
 
   return `
-
-
     <article
-
-      class="beer-card ${beer.type}-beer-card"
-
+      class="beer-card ${beer.category === "tap" ? "tap-card" : ""}"
+      data-id="${esc(beer.id)}"
     >
 
-
-      <div class="beer-card-title">
-
-
-        <span class="beer-small-icon">
-
-          ${icon}
-
-        </span>
-
-
-        <span>
-
-          ${beer.name}
-
-        </span>
-
-
+      <div class="beer-number">
+        ${esc(beer.number || beer.id)}
       </div>
 
 
-
-      <div
-
-        class="rating"
-
-        id="rating-${beer.id}"
-
-      >
-
-
-        ${createStars(beer)}
-
-
+      <div class="beer-photo">
+        ${image}
       </div>
 
 
+      <div class="beer-info">
 
-      <div class="score-numbers">
+        <h3>
+          ${esc(beer.name)}
+        </h3>
 
 
-        <span>1</span>
+        <div
+          class="rating"
+          role="group"
+          aria-label="Arvostele ${esc(beer.name)}"
+        >
 
-        <span>2</span>
+          ${[1,2,3,4,5].map(number => `
 
-        <span>3</span>
+            <button
+              class="star-button ${number <= score ? "selected" : ""}"
+              data-score="${number}"
+              aria-label="${number} tähteä"
+            >
+              ${number <= score ? "★" : "☆"}
+            </button>
 
-        <span>4</span>
+          `).join("")}
 
-        <span>5</span>
+        </div>
 
+
+        <div class="vote-status">
+
+          ${
+            score
+              ? `✓ Tallennettu · ${score}/5`
+              : "Ei vielä arvioitu"
+          }
+
+        </div>
 
       </div>
-
-
-
-      <div
-
-        class="save-status"
-
-        id="status-${beer.id}"
-
-      >
-
-        Ei vielä arvosteltu
-
-      </div>
-
 
     </article>
-
-
   `;
+}
 
+
+function render() {
+
+  const box = beers
+    .filter(b => b.category === "box")
+    .sort(
+      (a,b) =>
+        (a.order ?? 999) -
+        (b.order ?? 999)
+    );
+
+
+  const tap = beers
+    .filter(b => b.category === "tap")
+    .sort(
+      (a,b) =>
+        (a.order ?? 999) -
+        (b.order ?? 999)
+    );
+
+
+  $("loading").classList.add("hidden");
+
+
+  $("boxSection").classList.toggle(
+    "hidden",
+    !box.length
+  );
+
+
+  $("tapSection").classList.toggle(
+    "hidden",
+    !tap.length
+  );
+
+
+  $("emptyState").classList.toggle(
+    "hidden",
+    beers.length > 0
+  );
+
+
+  $("boxCount").textContent =
+    `${box.length} olutta`;
+
+
+  $("tapCount").textContent =
+    `${tap.length} olutta`;
+
+
+  $("boxBeers").innerHTML =
+    box.map(createCard).join("");
+
+
+  $("tapBeers").innerHTML =
+    tap.map(createCard).join("");
 
 }
 
 
+async function saveVote(beerId, score) {
 
-
-// =====================================
-// RENDERÖI OLUET
-// =====================================
-
-
-function renderBeers() {
-
-
-  const boxBeers =
-
-    beers.filter(
-
-      beer => beer.type === "box"
-
+  if (!currentUid) {
+    throw new Error(
+      "Käyttäjää ei ole kirjautunut"
     );
-
-
-
-  const tapBeers =
-
-    beers.filter(
-
-      beer => beer.type === "tap"
-
-    );
-
-
-
-  document
-    .getElementById("boxBeers")
-    .innerHTML =
-
-    boxBeers
-
-      .map(createBeerCard)
-
-      .join("");
-
-
-
-  document
-    .getElementById("tapBeers")
-    .innerHTML =
-
-    tapBeers
-
-      .map(createBeerCard)
-
-      .join("");
-
-
-
-  loadSavedRatings();
-
-
-}
-
-
-
-
-// =====================================
-// PÄIVITÄ TÄHTIEN ULKOASU
-// =====================================
-//
-// VAIN ANNETUT PISTEET
-// MUUTTUVAT KELTAISIKSI ★
-// =====================================
-
-
-function updateStars(
-
-  beerId,
-
-  score
-
-) {
-
-
-  const buttons =
-
-    document.querySelectorAll(
-
-      `[data-beer="${beerId}"]`
-
-    );
-
-
-
-  buttons.forEach(button => {
-
-
-    const buttonScore =
-
-      Number(
-
-        button.dataset.score
-
-      );
-
-
-
-    // VALITTU TÄHTI
-
-
-    if (buttonScore <= score) {
-
-
-      button.classList.add(
-        "selected"
-      );
-
-
-      // Täytetty tähti
-
-      button.textContent =
-        "★";
-
-
-    }
-
-
-    // EI VALITTU TÄHTI
-
-
-    else {
-
-
-      button.classList.remove(
-        "selected"
-      );
-
-
-      // Tyhjä tähti
-
-      button.textContent =
-        "☆";
-
-
-    }
-
-
-  });
-
-
-}
-
-
-
-
-// =====================================
-// TALLENNA ÄÄNI FIREBASEEN
-// =====================================
-
-
-async function saveVote(
-
-  beerId,
-
-  score
-
-) {
-
-
-  const status =
-
-    document.getElementById(
-
-      `status-${beerId}`
-
-    );
-
-
-
-  status.textContent =
-
-    "Tallennetaan...";
-
-
-
-  try {
-
-
-    const voteReference =
-
-      ref(
-
-        database,
-
-        `votes/${beerId}/${participantId}`
-
-      );
-
-
-
-    await set(
-
-      voteReference,
-
-      {
-
-        score:
-          score,
-
-
-        updatedAt:
-          Date.now()
-
-      }
-
-    );
-
-
-
-    // PÄIVITÄ TÄHDET VASTA,
-    // KUN ÄÄNI ON TALLENNETTU
-
-
-    updateStars(
-
-      beerId,
-
-      score
-
-    );
-
-
-
-    status.innerHTML =
-
-      `
-
-        <span class="saved-check">
-
-          ✓
-
-        </span>
-
-        Tallennettu
-
-        ·
-
-        ${score}/5
-
-      `;
-
-
   }
 
 
-  catch (error) {
+  await set(
+    ref(
+      database,
+      `votes/${beerId}/${currentUid}`
+    ),
+    {
+      score: score,
+      updatedAt: serverTimestamp()
+    }
+  );
 
 
-    console.error(error);
+  myVotes[beerId] = score;
 
+  render();
 
-    status.textContent =
-
-      "Tallennus epäonnistui";
-
-
-  }
-
+  toast(
+    "Arvio tallennettu ✓"
+  );
 
 }
-
-
-
-
-// =====================================
-// TÄHDEN KLIKKAUS
-// =====================================
 
 
 document.addEventListener(
-
   "click",
-
-  event => {
-
+  async event => {
 
     const button =
-
       event.target.closest(
-
         ".star-button"
-
       );
-
 
 
     if (!button) {
-
-
       return;
-
-
     }
 
 
-
-    const beerId =
-
-      button.dataset.beer;
-
-
-
-    const score =
-
-      Number(
-
-        button.dataset.score
-
+    const card =
+      button.closest(
+        ".beer-card"
       );
 
 
-
-    saveVote(
-
-      beerId,
-
-      score
-
-    );
+    if (!card) {
+      return;
+    }
 
 
-  }
-
-);
-
+    const beerId =
+      card.dataset.id;
 
 
-
-// =====================================
-// LATAA AIEMMIN TALLENNETUT ARVIOT
-// =====================================
-
-
-async function loadSavedRatings() {
-
-
-  for (const beer of beers) {
+    const score =
+      Number(
+        button.dataset.score
+      );
 
 
     try {
 
+      button.disabled = true;
 
-      const voteReference =
+      await saveVote(
+        beerId,
+        score
+      );
 
-        ref(
-
-          database,
-
-          `votes/${beer.id}/${participantId}`
-
-        );
-
-
-
-      const snapshot =
-
-        await get(
-
-          voteReference
-
-        );
-
-
-
-      if (snapshot.exists()) {
-
-
-        const vote =
-
-          snapshot.val();
-
-
-
-        // NÄYTÄ AIEMMIN ANNETUT
-        // KELTAISET TÄHDET
-
-
-        updateStars(
-
-          beer.id,
-
-          vote.score
-
-        );
-
-
-
-        const status =
-
-          document.getElementById(
-
-            `status-${beer.id}`
-
-          );
-
-
-
-        status.innerHTML =
-
-          `
-
-            <span class="saved-check">
-
-              ✓
-
-            </span>
-
-            Tallennettu
-
-            ·
-
-            ${vote.score}/5
-
-          `;
-
-
-      }
-
-
-    }
-
-
-    catch (error) {
-
+    } catch (error) {
 
       console.error(error);
 
+      toast(
+        "Tallennus epäonnistui"
+      );
+
+    } finally {
+
+      button.disabled = false;
 
     }
 
+  }
+);
+
+
+onValue(
+  ref(database, "beers"),
+
+  snapshot => {
+
+    const data =
+      snapshot.val() || {};
+
+
+    beers =
+      Object.entries(data).map(
+        ([id,value]) => ({
+          id,
+          ...value
+        })
+      );
+
+
+    render();
+
+  },
+
+  error => {
+
+    $("loading").classList.add(
+      "hidden"
+    );
+
+
+    $("error").textContent =
+      "Oluiden lataus epäonnistui. Tarkista Firebase-asetukset ja Security Rules.";
+
+
+    $("error").classList.remove(
+      "hidden"
+    );
+
+
+    console.error(error);
 
   }
+);
 
 
-}
+onAuthStateChanged(
+  auth,
+
+  user => {
+
+    if (!user) {
+      return;
+    }
 
 
+    currentUid =
+      user.uid;
 
 
-// =====================================
-// KÄYNNISTYS
-// =====================================
+    onValue(
+      ref(database, "votes"),
+
+      snapshot => {
+
+        const all =
+          snapshot.val() || {};
 
 
-renderBeers();
+        myVotes = {};
+
+
+        for (
+          const [beerId,users]
+          of Object.entries(all)
+        ) {
+
+          if (
+            users &&
+            users[currentUid]
+          ) {
+
+            myVotes[beerId] =
+              Number(
+                users[currentUid].score || 0
+              );
+
+          }
+
+        }
+
+
+        render();
+
+      }
+    );
+
+  }
+);
+
+
+signInAnonymously(auth)
+  .catch(error => {
+
+    $("error").textContent =
+      "Äänestyskirjautuminen epäonnistui. Ota Firebase Authentication > Anonymous käyttöön.";
+
+
+    $("error").classList.remove(
+      "hidden"
+    );
+
+
+    console.error(error);
+
+  });
