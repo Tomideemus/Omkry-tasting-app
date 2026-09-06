@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="fi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<meta
+  name="theme-color"
+  content="#0a0c0d"
+>
+
+<title>OMKRY – Ylläpito</title>
+
+<link
+  rel="stylesheet"
+  href="style.css"
+>
+
+</head>
+
+
+<body>
+
+
+<header class="topbar">
+
+  <div class="brand">
+
+    <span class="brand-icon">
+      🍺
+    </span>
+
+    <div>
+
+      <strong>
+        OMKRY
+      </strong>
+
+      <small>
+        ADMIN
+      </small>
+
+    </div>
+
+  </div>
+
+
+  <a
+    class="top-link"
+    href="index.html"
+  >
+    ← Äänestyssivu
+  </a>
+
+</header>
+
+
+<main class="container admin-page">
+
+
+<section
+  id="loginBox"
+  class="admin-login"
+>
+
+  <p class="eyebrow">
+    ADMIN
+  </p>
+
+  <h1>
+    Ylläpito
+  </h1>
+
+  <p>
+    Kirjaudu ylläpitotunnuksella
+    hallitaksesi oluita ja testituloksia.
+  </p>
+
+
+  <input
+    id="email"
+    type="email"
+    placeholder="Sähköposti"
+    autocomplete="username"
+  >
+
+
+  <input
+    id="password"
+    type="password"
+    placeholder="Salasana"
+    autocomplete="current-password"
+  >
+
+
+  <button
+    id="login"
+    class="primary-btn"
+  >
+    Kirjaudu
+  </button>
+
+
+  <div
+    id="loginError"
+    class="notice error hidden"
+  ></div>
+
+</section>
+
+
+<section
+  id="adminPanel"
+  class="hidden"
+>
+
+
+<div class="admin-head">
+
+  <div>
+
+    <p class="eyebrow">
+      OLUTREKISTERI
+    </p>
+
+    <h1>
+      Hallitse oluita
+    </h1>
+
+    <p class="admin-subtitle">
+      Valitse olut → Muokkaa → Ota kuva →
+      kirjoita nimi → Tallenna.
+    </p>
+
+  </div>
+
+
+  <button
+    id="logout"
+    class="ghost-btn"
+  >
+    Kirjaudu ulos
+  </button>
+
+</div>
+
+
+<div class="admin-toolbar">
+
+  <button
+    id="seed"
+    class="ghost-btn"
+  >
+    Luo 24 + 4 olutpaikkaa
+  </button>
+
+
+  <button
+    id="clearVotes"
+    class="danger-btn"
+  >
+    Poista kaikki äänet
+  </button>
+
+</div>
+
+
+<div
+  id="adminNotice"
+  class="notice hidden"
+></div>
+
+
+<section class="admin-section">
+
+  <div class="admin-section-title">
+
+    <span>📦</span>
+
+    <h2>
+      Laatikko-oluet
+      <small>(24)</small>
+    </h2>
+
+  </div>
+
+
+  <div
+    id="boxAdminGrid"
+    class="admin-grid"
+  ></div>
+
+</section>
+
+
+<section class="admin-section tap-admin-section">
+
+  <div class="admin-section-title">
+
+    <span>🍺</span>
+
+    <h2>
+      Hanaoluet
+      <small>(4)</small>
+    </h2>
+
+  </div>
+
+
+  <div
+    id="tapAdminGrid"
+    class="admin-grid tap-admin-grid"
+  ></div>
+
+</section>
+
+
+</section>
+
+</main>
+
+
+<div
+  id="beerModal"
+  class="modal hidden"
+>
+
+  <div class="modal-backdrop"></div>
+
+
+  <form
+    id="beerForm"
+    class="form-card"
+  >
+
+
+    <button
+      type="button"
+      id="closeBeer"
+      class="close"
+    >
+      ×
+    </button>
+
+
+    <p class="eyebrow">
+      MUOKKAA OLUTTA
+    </p>
+
+
+    <h2 id="formTitle">
+      Olut 01
+    </h2>
+
+
+    <input
+      type="hidden"
+      id="beerId"
+    >
+
+
+    <div class="edit-meta">
+
+      <span id="metaNumber">
+        01
+      </span>
+
+      <span id="metaCategory">
+        LAATIKKO-OLUT
+      </span>
+
+    </div>
+
+
+    <div
+      id="preview"
+      class="upload-preview"
+    >
+      <span>
+        📷 Lisää olutkuva
+      </span>
+    </div>
+
+
+    <label class="camera-button">
+
+      📷 Ota kuva
+
+      <input
+        id="beerImageFile"
+        type="file"
+        accept="image/*"
+        capture="environment"
+      >
+
+    </label>
+
+
+    <label>
+
+      Nimi
+
+      <input
+        id="beerName"
+        maxlength="80"
+        required
+        placeholder="Kirjoita oluen nimi"
+      >
+
+    </label>
+
+
+    <input
+      type="hidden"
+      id="beerCategory"
+    >
+
+    <input
+      type="hidden"
+      id="beerNumber"
+    >
+
+    <input
+      type="hidden"
+      id="beerOrder"
+    >
+
+
+    <button
+      class="primary-btn save-beer-btn"
+      type="submit"
+    >
+      ✓ Tallenna
+    </button>
+
+
+  </form>
+
+</div>
+
+
+<script
+  type="module"
+  src="admin.js"
+></script>
+
+</body>
+</html>
