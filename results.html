@@ -1,412 +1,139 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fi">
-
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>
-    OMKRY Live Results
-  </title>
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0c0d">
+<title>OMKRY – Live Results</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
-
-<body class="results-body">
-
+<body>
 
 <header class="topbar">
 
-
   <div class="brand">
-
-
-    <span class="brand-icon">
-
-      🍺
-
-    </span>
-
-
-    <span class="brand-name">
-
-      OMKRY
-
-    </span>
-
-
-    <span class="brand-subtitle">
-
-      BEER TASTING
-
-    </span>
-
-
+    <span class="brand-icon">🍺</span>
+    <div>
+      <strong>OMKRY</strong>
+      <small>BEER TASTING</small>
+    </div>
   </div>
 
+  <div class="top-actions">
 
-
-  <div class="live-status">
-
-
-    <span class="live-dot">
-
-      ●
-
+    <span class="live-pill">
+      <i></i> PÄIVITTYY LIVE
     </span>
 
-
-    PÄIVITTYY LIVE
-
+    <a class="top-link" href="index.html">
+      ⭐ Äänestyssivu
+    </a>
 
   </div>
-
 
 </header>
 
+<main class="container results-page">
 
+  <section class="hero center">
 
-<main class="results-page">
+    <p class="eyebrow">REAL-TIME</p>
 
-
-  <div class="results-title">
-
-
-    <h1>
-
-      LIVE RESULTS
-
-    </h1>
-
+    <h1>Live Results</h1>
 
     <p>
-
-      Tulokset päivittyvät reaaliajassa
-
+      Tulokset päivittyvät automaattisesti jokaisen äänen jälkeen.
     </p>
 
-
-  </div>
-
+  </section>
 
 
-  <div class="results-columns">
+  <div class="result-columns">
 
 
-    <!-- LAATIKKO-OLUET -->
+    <section class="result-panel box-panel">
 
+      <div class="section-title">
 
-    <section class="results-category-card box-results-card">
+        <span>📦</span>
 
-
-      <div class="results-category-header">
-
-
-        <h2>
-
-          📦 LAATIKKOOLUET
-
-        </h2>
-
-
-        <span id="boxVoteCount">
-
-          Yhteensä ääniä: 0
-
-        </span>
-
+        <div>
+          <h2>Laatikko-olut</h2>
+          <small id="boxVotes">0 ääntä</small>
+        </div>
 
       </div>
 
+      <div id="boxPodium" class="podium"></div>
 
-
-      <div
-
-        id="boxPodium"
-
-        class="podium"
-
-      ></div>
-
-
-
-      <div
-
-        id="boxRanking"
-
-        class="ranking-list"
-
-      ></div>
-
-
-
-      <button
-
-        class="show-all-button box-button"
-
-        id="showBoxWinner"
-
-      >
-
-        🏆 KATSO LAATIKKOVOITTAJA
-
-      </button>
-
+      <div id="boxRanking" class="ranking"></div>
 
     </section>
 
 
+    <section class="result-panel tap-panel">
 
-    <!-- HANAOLUET -->
+      <div class="section-title">
 
+        <span>🍺</span>
 
-    <section class="results-category-card tap-results-card">
-
-
-      <div class="results-category-header">
-
-
-        <h2>
-
-          🍺 HANAOLUET
-
-        </h2>
-
-
-        <span id="tapVoteCount">
-
-          Yhteensä ääniä: 0
-
-        </span>
-
+        <div>
+          <h2>Hanaolut</h2>
+          <small id="tapVotes">0 ääntä</small>
+        </div>
 
       </div>
 
+      <div id="tapPodium" class="podium"></div>
 
-
-      <div
-
-        id="tapPodium"
-
-        class="podium"
-
-      ></div>
-
-
-
-      <div
-
-        id="tapRanking"
-
-        class="ranking-list"
-
-      ></div>
-
-
-
-      <button
-
-        class="show-all-button tap-button"
-
-        id="showTapWinner"
-
-      >
-
-        🏆 KATSO HANAVOITTAJA
-
-      </button>
-
+      <div id="tapRanking" class="ranking"></div>
 
     </section>
 
-
   </div>
-
-
-
-  <div class="winner-controls">
-
-
-    <button
-
-      id="showBothWinners"
-
-      class="winner-main-button"
-
-    >
-
-      🏆 KATSO VOITTAJAT
-
-    </button>
-
-
-  </div>
-
 
 </main>
 
 
+<div id="winnerModal" class="modal hidden">
 
-<!-- VOITTAJA-ANIMAATIO -->
+  <div class="modal-backdrop"></div>
 
+  <div id="winnerCard" class="winner-card">
 
-<div
-
-  id="winnerModal"
-
-  class="winner-modal"
-
->
-
-
-  <div
-
-    id="winnerBackground"
-
-    class="winner-background"
-
-  ></div>
-
-
-
-  <button
-
-    id="closeWinner"
-
-    class="winner-close"
-
-  >
-
-    ✕
-
-  </button>
-
-
-
-  <div
-
-    id="winnerContent"
-
-    class="winner-content"
-
-  >
-
-
-    <div
-
-      id="confetti"
-
-      class="confetti-container"
-
-    ></div>
-
-
-
-    <div
-
-      id="winnerCategory"
-
-      class="winner-category"
-
-    ></div>
-
-
-
-    <h1>
-
-      VOITTAJA!
-
-    </h1>
-
-
-
-    <div class="winner-laurels">
-
-      🏆
-
-    </div>
-
-
-
-    <div
-
-      id="winnerIcon"
-
-      class="winner-icon"
-
-    ></div>
-
-
-
-    <div
-
-      id="winnerName"
-
-      class="winner-name"
-
-    ></div>
-
-
-
-    <div
-
-      id="winnerScore"
-
-      class="winner-score"
-
-    ></div>
-
-
-
-    <div
-
-      id="winnerVotes"
-
-      class="winner-votes"
-
-    ></div>
-
-
-
-    <button
-
-      id="winnerNextButton"
-
-      class="winner-next-button"
-
-    >
-
-      SULJE
-
+    <button id="closeWinner" class="close">
+      ×
     </button>
 
+    <div id="winnerConfetti" class="confetti"></div>
+
+    <div class="winner-icon">
+      🏆
+    </div>
+
+    <div class="eyebrow">
+      VOITTAJA
+    </div>
+
+    <div id="winnerCategory" class="winner-category"></div>
+
+    <div id="winnerImage" class="winner-image"></div>
+
+    <div id="winnerNumber" class="winner-number large"></div>
+
+    <h2 id="winnerName"></h2>
+
+    <div id="winnerScore" class="winner-score"></div>
+
+    <div id="winnerVotes" class="winner-votes"></div>
 
   </div>
-
 
 </div>
 
 
-
-<script
-
-  type="module"
-
-  src="results.js"
-
-></script>
-
+<script type="module" src="results.js"></script>
 
 </body>
-
 </html>
