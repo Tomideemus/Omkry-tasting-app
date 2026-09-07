@@ -1,9 +1,9 @@
 import {
   ref,
-  onValue,
+  get,
   set,
-  update,
-  remove
+  remove,
+  onValue
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
 import {
@@ -12,896 +12,670 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
-import {
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-storage.js";
+import { database, auth } from "./firebase-config.js";
 
-import {
-  database,
-  auth,
-  storage
-} from "./firebase-config.js";
+const $ = (id) => document.getElementById(id);
 
-
-const $ =
-  id => document.getElementById(id);
-
-
-let user = null;
+let currentUser = null;
+let currentBeer = null;
 let beers = {};
 
+const loginSection = $("loginSection");
+const adminSection = $("adminSection");
 
-const esc = value =>
-  String(value ?? "").replace(
-    /[&<>"']/g,
-    char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[char])
-  );
+const loginForm = $("loginForm");
+const emailInput = $("email");
+const passwordInput = $("password");
+const loginError = $("loginError");
 
+const beerGrid = $("beerGrid");
 
-function notice(
-  text,
-  error = false
-) {
+const editor = $("editor");
+const editorForm = $("editorForm");
 
-  const n =
-    $("adminNotice");
+const beerImage = $("beerImage");
+const imageInput = $("imageInput");
+const beerName = $("beerName");
 
+const formTitle = $("formTitle");
+const metaNumber = $("metaNumber");
+const metaCategory = $("metaCategory");
 
-  n.textContent =
-    text;
+const saveButton = $("saveButton");
+const cancelButton = $("cancelButton");
 
+const createBeersButton = $("createBeersButton");
+const clearVotesButton = $("clearVotesButton");
 
-  n.className =
-    `notice ${error ? "error" : ""}`;
-
-
-  n.classList.remove(
-    "hidden"
-  );
+const logoutButton = $("logoutButton");
 
 
-  setTimeout(
-    () =>
-      n.classList.add(
-        "hidden"
-      ),
-    3500
-  );
-
-}
-
-
-function modal(open) {
-
-  $("beerModal")
-    .classList
-    .toggle(
-      "hidden",
-      !open
-    );
-
-}
-
+// --------------------------------------------------
+// ADMIN CHECK
+// --------------------------------------------------
 
 async function isAdmin(uid) {
-
-  const snap =
-    await new Promise(
-      resolve =>
-        onValue(
-          ref(
-            database,
-            `users/${uid}/role`
-          ),
-          snapshot =>
-            resolve(snapshot),
-          {
-            onlyOnce: true
-          }
-        )
-    );
-
-
-  return (
-    snap.val() ===
-    "admin"
-  );
-
+  const snapshot = await get(ref(database, `users/${uid}/role`));
+  return snapshot.exists() && snapshot.val() === "admin";
 }
 
 
-onAuthStateChanged(
-  auth,
-  async u => {
+// --------------------------------------------------
+// IMAGE COMPRESSION
+// --------------------------------------------------
 
-    user = u;
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
 
-
-    if (
-      !u ||
-      u.isAnonymous
-    ) {
-
-      $("loginBox")
-        .classList
-        .remove("hidden");
-
-
-      $("adminPanel")
-        .classList
-        .add("hidden");
-
-
+    if (!file || !file.type.startsWith("image/")) {
+      reject(new Error("Valittu tiedosto ei ole kuva."));
       return;
-
     }
 
+    const reader = new FileReader();
 
-    try {
+    reader.onload = (event) => {
 
-      if (
-        await isAdmin(
-          u.uid
-        )
-      ) {
+      const img = new Image();
 
-        $("loginBox")
-          .classList
-          .add("hidden");
+      img.onload = () => {
 
+        const MAX_SIZE = 1200;
 
-        $("adminPanel")
-          .classList
-          .remove("hidden");
+        let width = img.width;
+        let height = img.height;
 
-
-        render();
-
-      } else {
-
-        await signOut(
-          auth
-        );
-
-
-        $("loginError")
-          .textContent =
-          "Tällä tunnuksella ei ole admin-oikeutta.";
-
-
-        $("loginError")
-          .classList
-          .remove("hidden");
-
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-  }
-);
-
-
-$("login").onclick =
-  async () => {
-
-    try {
-
-      await signInWithEmailAndPassword(
-        auth,
-        $("email").value,
-        $("password").value
-      );
-
-    } catch (error) {
-
-      $("loginError")
-        .textContent =
-        "Kirjautuminen epäonnistui.";
-
-
-      $("loginError")
-        .classList
-        .remove("hidden");
-
-    }
-
-  };
-
-
-$("logout").onclick =
-  () =>
-    signOut(auth);
-
-
-onValue(
-  ref(database, "beers"),
-  snapshot => {
-
-    beers =
-      snapshot.val() || {};
-
-
-    render();
-
-  }
-);
-
-
-function card(
-  id,
-  b,
-  category,
-  index
-) {
-
-  const number =
-    category === "box"
-      ? String(index).padStart(
-          2,
-          "0"
-        )
-      : `TAP ${String(index).padStart(
-          2,
-          "0"
-        )}`;
-
-
-  return `
-
-    <article class="admin-beer-card">
-
-      <div class="admin-card-number">
-        ${number}
-      </div>
-
-
-      <div class="admin-card-photo">
-
-        ${
-          b?.image
-            ? `<img
-                src="${esc(b.image)}"
-                alt=""
-              >`
-            : `
-              <span>📷</span>
-              <small>Ei kuvaa</small>
-            `
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round(height * MAX_SIZE / width);
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round(width * MAX_SIZE / height);
+            height = MAX_SIZE;
+          }
         }
 
-      </div>
+        const canvas = document.createElement("canvas");
 
+        canvas.width = width;
+        canvas.height = height;
 
-      <div class="admin-card-info">
+        const ctx = canvas.getContext("2d");
 
-        <strong>
-          ${esc(
-            b?.name ||
-            "Nimeämätön olut"
-          )}
-        </strong>
+        ctx.drawImage(img, 0, 0, width, height);
 
-        <small>
-          ${
-            b?.name
-              ? "Kuva ja nimi tallennettu"
-              : "Lisää kuva ja nimi"
-          }
-        </small>
+        // JPEG quality
+        const compressed = canvas.toDataURL("image/jpeg", 0.75);
 
-      </div>
+        resolve(compressed);
+      };
 
+      img.onerror = () => {
+        reject(new Error("Kuvan käsittely epäonnistui."));
+      };
 
-      <button
-        class="primary-btn edit-beer"
-        data-edit="${id}"
-      >
-        ✎ Muokkaa
-      </button>
+      img.src = event.target.result;
+    };
 
-    </article>
+    reader.onerror = () => {
+      reject(new Error("Kuvan lukeminen epäonnistui."));
+    };
 
-  `;
-
+    reader.readAsDataURL(file);
+  });
 }
 
 
-function render() {
+// --------------------------------------------------
+// LOGIN
+// --------------------------------------------------
 
-  const boxes = [];
-  const taps = [];
+loginForm?.addEventListener("submit", async (event) => {
 
+  event.preventDefault();
 
-  for (
-    let i = 1;
-    i <= 24;
-    i++
-  ) {
+  loginError.textContent = "";
 
-    const id =
-      `BOX-${String(i).padStart(
-        2,
-        "0"
-      )}`;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
+  try {
 
-    boxes.push(
-      card(
-        id,
-        beers[id],
-        "box",
-        i
-      )
-    );
+    const credential =
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-  }
+    const admin = await isAdmin(credential.user.uid);
 
+    if (!admin) {
 
-  for (
-    let i = 1;
-    i <= 4;
-    i++
-  ) {
+      await signOut(auth);
 
-    const id =
-      `TAP-${String(i).padStart(
-        2,
-        "0"
-      )}`;
+      loginError.textContent =
+        "Tällä käyttäjällä ei ole admin-oikeuksia.";
 
-
-    taps.push(
-      card(
-        id,
-        beers[id],
-        "tap",
-        i
-      )
-    );
-
-  }
-
-
-  if (
-    $("boxAdminGrid")
-  ) {
-
-    $("boxAdminGrid")
-      .innerHTML =
-      boxes.join("");
-
-  }
-
-
-  if (
-    $("tapAdminGrid")
-  ) {
-
-    $("tapAdminGrid")
-      .innerHTML =
-      taps.join("");
-
-  }
-
-}
-
-
-$("seed").onclick =
-  async () => {
-
-    if (
-      !user ||
-      !confirm(
-        "Luodaanko puuttuvat 24 laatikko-olutta ja 4 hanaolutta?"
-      )
-    ) {
       return;
     }
 
+    showAdmin();
 
-    const updates = {};
+  } catch (error) {
 
+    console.error(error);
 
-    for (
-      let i = 1;
-      i <= 24;
-      i++
-    ) {
-
-      const id =
-        `BOX-${String(i).padStart(
-          2,
-          "0"
-        )}`;
+    loginError.textContent =
+      "Kirjautuminen epäonnistui: " + error.message;
+  }
+});
 
 
-      if (!beers[id]) {
+// --------------------------------------------------
+// AUTH STATE
+// --------------------------------------------------
 
-        updates[
-          `beers/${id}`
-        ] = {
+onAuthStateChanged(auth, async (user) => {
 
-          name:
-            `Olut ${String(i).padStart(
-              2,
-              "0"
-            )}`,
+  if (!user) {
 
-          category:
-            "box",
+    currentUser = null;
 
-          number:
-            String(i).padStart(
-              2,
-              "0"
-            ),
+    if (loginSection) loginSection.hidden = false;
+    if (adminSection) adminSection.hidden = true;
 
-          order:
-            i,
+    return;
+  }
 
-          image:
-            ""
+  try {
 
-        };
+    const admin = await isAdmin(user.uid);
 
+    if (!admin) {
+
+      await signOut(auth);
+
+      return;
+    }
+
+    currentUser = user;
+
+    showAdmin();
+
+  } catch (error) {
+
+    console.error(error);
+  }
+});
+
+
+// --------------------------------------------------
+// SHOW ADMIN
+// --------------------------------------------------
+
+function showAdmin() {
+
+  if (loginSection) loginSection.hidden = true;
+  if (adminSection) adminSection.hidden = false;
+
+  loadBeers();
+}
+
+
+// --------------------------------------------------
+// LOAD BEERS
+// --------------------------------------------------
+
+function loadBeers() {
+
+  onValue(
+    ref(database, "beers"),
+    (snapshot) => {
+
+      beers = snapshot.val() || {};
+
+      renderBeers();
+    }
+  );
+}
+
+
+// --------------------------------------------------
+// RENDER BEER CARDS
+// --------------------------------------------------
+
+function renderBeers() {
+
+  if (!beerGrid) return;
+
+  beerGrid.innerHTML = "";
+
+  const beerList = Object.entries(beers)
+    .sort((a, b) => {
+
+      const A = a[1];
+      const B = b[1];
+
+      if (A.category !== B.category) {
+        return A.category === "box" ? -1 : 1;
       }
 
-    }
+      return Number(A.order || 0) - Number(B.order || 0);
+    });
+
+  beerList.forEach(([id, beer]) => {
+
+    const card = document.createElement("div");
+
+    card.className =
+      beer.category === "tap"
+        ? "admin-beer-card tap"
+        : "admin-beer-card";
+
+    const image = beer.image
+      ? `<img src="${beer.image}" alt="">`
+      : `<div class="no-image">📷</div>`;
+
+    const number =
+      beer.category === "tap"
+        ? `Hana ${beer.number}`
+        : `Olut ${beer.number}`;
+
+    card.innerHTML = `
+      <div class="admin-beer-image">
+        ${image}
+      </div>
+
+      <div class="admin-beer-info">
+
+        <div class="admin-beer-number">
+          ${number}
+        </div>
+
+        <div class="admin-beer-name">
+          ${escapeHtml(beer.name || "Nimeämätön olut")}
+        </div>
+
+        <button
+          type="button"
+          class="edit-beer-button"
+          data-id="${id}">
+          Muokkaa
+        </button>
+
+      </div>
+    `;
+
+    card
+      .querySelector(".edit-beer-button")
+      .addEventListener("click", () => {
+
+        openEditor(id);
+      });
+
+    beerGrid.appendChild(card);
+  });
+}
 
 
-    for (
-      let i = 1;
-      i <= 4;
-      i++
-    ) {
-
-      const id =
-        `TAP-${String(i).padStart(
-          2,
-          "0"
-        )}`;
-
-
-      if (!beers[id]) {
-
-        updates[
-          `beers/${id}`
-        ] = {
-
-          name:
-            `Hana ${String(i).padStart(
-              2,
-              "0"
-            )}`,
-
-          category:
-            "tap",
-
-          number:
-            `TAP ${String(i).padStart(
-              2,
-              "0"
-            )}`,
-
-          order:
-            i,
-
-          image:
-            ""
-
-        };
-
-      }
-
-    }
-
-
-    try {
-
-      await update(
-        ref(database),
-        updates
-      );
-
-
-      notice(
-        "Olutpaikat luotu ✓"
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      notice(
-        "Olutpaikkojen luonti epäonnistui.",
-        true
-      );
-
-    }
-
-  };
-
+// --------------------------------------------------
+// OPEN EDITOR
+// --------------------------------------------------
 
 function openEditor(id) {
 
-  const b =
-    beers[id] || {};
+  const beer = beers[id];
 
+  if (!beer) return;
 
-  $("beerId").value =
-    id;
+  currentBeer = id;
 
+  beerName.value = beer.name || "";
 
-  $("beerName").value =
-    b.name || "";
+  if (beer.image) {
 
+    beerImage.src = beer.image;
+    beerImage.hidden = false;
 
-  $("beerCategory").value =
-    b.category || "box";
+  } else {
 
-
-  $("beerNumber").value =
-    b.number || id;
-
-
-  $("beerOrder").value =
-    b.order || 1;
-
-
-  $("preview").innerHTML =
-    b.image
-      ? `<img
-          src="${esc(b.image)}"
-          alt=""
-        >`
-      : `
-        <div class="preview-empty">
-          📷 Ota kuva
-        </div>
-      `;
-
-
-  $("beerImageFile").value =
-    "";
-
-
-  modal(true);
-
-}
-
-
-document.addEventListener(
-  "click",
-  event => {
-
-    const edit =
-      event.target.closest(
-        "[data-edit]"
-      );
-
-
-    if (edit) {
-
-      openEditor(
-        edit.dataset.edit
-      );
-
-    }
-
-
-    if (
-      event.target.id ===
-        "closeBeer" ||
-      event.target.classList.contains(
-        "modal-backdrop"
-      )
-    ) {
-
-      modal(false);
-
-    }
-
+    beerImage.src = "";
+    beerImage.hidden = true;
   }
-);
 
-
-async function resizeImage(file) {
-
-  const bitmap =
-    await createImageBitmap(
-      file
+  formTitle.textContent =
+    beer.name ||
+    (
+      beer.category === "tap"
+        ? `Hana ${beer.number}`
+        : `Olut ${beer.number}`
     );
 
+  metaNumber.textContent =
+    beer.number || id;
 
-  const max = 1200;
+  metaCategory.textContent =
+    beer.category === "tap"
+      ? "HANAN OLUT"
+      : "LAATIKKO-OLUT";
 
+  editor.hidden = false;
 
-  const scale =
-    Math.min(
-      1,
-      max / bitmap.width,
-      max / bitmap.height
-    );
-
-
-  const canvas =
-    document.createElement(
-      "canvas"
-    );
-
-
-  canvas.width =
-    Math.round(
-      bitmap.width * scale
-    );
-
-
-  canvas.height =
-    Math.round(
-      bitmap.height * scale
-    );
-
-
-  const ctx =
-    canvas.getContext(
-      "2d"
-    );
-
-
-  ctx.drawImage(
-    bitmap,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-
-  return new Promise(
-    resolve =>
-      canvas.toBlob(
-        resolve,
-        "image/jpeg",
-        0.82
-      )
-  );
-
+  editor.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 }
 
 
-$("beerImageFile").onchange =
+// --------------------------------------------------
+// IMAGE SELECTION
+// --------------------------------------------------
+
+imageInput?.addEventListener("change", async () => {
+
+  const file = imageInput.files?.[0];
+
+  if (!file) return;
+
+  try {
+
+    saveButton.disabled = true;
+
+    saveButton.textContent = "Käsitellään kuvaa...";
+
+    const imageData =
+      await compressImage(file);
+
+    beerImage.src = imageData;
+    beerImage.hidden = false;
+
+    // Store temporarily in the editor
+    beerImage.dataset.pendingImage = imageData;
+
+    saveButton.textContent = "Tallenna";
+    saveButton.disabled = false;
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Kuvan käsittely epäonnistui: " +
+      error.message
+    );
+
+    saveButton.textContent = "Tallenna";
+    saveButton.disabled = false;
+  }
+});
+
+
+// --------------------------------------------------
+// SAVE BEER
+// --------------------------------------------------
+
+editorForm?.addEventListener("submit", async (event) => {
+
+  event.preventDefault();
+
+  if (!currentBeer) return;
+
+  const beer = beers[currentBeer];
+
+  if (!beer) return;
+
+  const name =
+    beerName.value.trim();
+
+  if (!name) {
+
+    alert("Anna oluelle nimi.");
+
+    return;
+  }
+
+  try {
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Tallennetaan...";
+
+    const data = {
+      ...beer,
+      name: name
+    };
+
+    // If a new image was selected,
+    // save it directly into Realtime Database.
+    if (beerImage.dataset.pendingImage) {
+
+      data.image =
+        beerImage.dataset.pendingImage;
+
+      delete beerImage.dataset.pendingImage;
+    }
+
+    await set(
+      ref(database, `beers/${currentBeer}`),
+      data
+    );
+
+    alert("Olut tallennettu!");
+
+    editor.hidden = true;
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Tallennus epäonnistui: " +
+      error.message
+    );
+
+  } finally {
+
+    saveButton.disabled = false;
+    saveButton.textContent = "Tallenna";
+  }
+});
+
+
+// --------------------------------------------------
+// CANCEL
+// --------------------------------------------------
+
+cancelButton?.addEventListener("click", () => {
+
+  editor.hidden = true;
+
+  currentBeer = null;
+});
+
+
+// --------------------------------------------------
+// CREATE 24 + 4 BEERS
+// --------------------------------------------------
+
+createBeersButton?.addEventListener(
+  "click",
   async () => {
 
-    const file =
-      $("beerImageFile")
-        .files[0];
-
-
-    if (!file) {
+    if (!confirm(
+      "Luodaanko 24 laatikko-olutta ja 4 hanaolutta?"
+    )) {
       return;
     }
-
 
     try {
 
-      const blob =
-        await resizeImage(
-          file
-        );
+      const updates = {};
 
+      // 24 boxed beers
 
-      $("preview").innerHTML =
-        `<img
-          src="${URL.createObjectURL(
-            blob
-          )}"
-          alt="Esikatselu"
-        >`;
+      for (let i = 1; i <= 24; i++) {
 
-    } catch (error) {
+        const id =
+          `BOX-${String(i).padStart(2, "0")}`;
 
-      notice(
-        "Kuvan käsittely epäonnistui.",
-        true
-      );
+        if (!beers[id]) {
 
-    }
+          updates[`beers/${id}`] = {
 
-  };
+            name: `Olut ${String(i).padStart(2, "0")}`,
 
+            category: "box",
 
-$("beerForm").onsubmit =
-  async event => {
+            number:
+              String(i).padStart(2, "0"),
 
-    event.preventDefault();
+            order: i,
 
-
-    if (!user) {
-      return;
-    }
-
-
-    const id =
-      $("beerId").value;
-
-
-    if (!id) {
-      return;
-    }
-
-
-    const old =
-      beers[id] || {};
-
-
-    let image =
-      old.image || "";
-
-
-    const file =
-      $("beerImageFile")
-        .files[0];
-
-
-    const name =
-      $("beerName")
-        .value
-        .trim();
-
-
-    if (!name) {
-
-      notice(
-        "Kirjoita oluen nimi.",
-        true
-      );
-
-      return;
-
-    }
-
-
-    try {
-
-      if (file) {
-
-        const blob =
-          await resizeImage(
-            file
-          );
-
-
-        const path =
-          storageRef(
-            storage,
-            `beer-images/${id}.jpg`
-          );
-
-
-        await uploadBytes(
-          path,
-          blob,
-          {
-            contentType:
-              "image/jpeg"
-          }
-        );
-
-
-        image =
-          await getDownloadURL(
-            path
-          );
-
+            image: ""
+          };
+        }
       }
 
+      // 4 tap beers
+
+      for (let i = 1; i <= 4; i++) {
+
+        const id =
+          `TAP-${String(i).padStart(2, "0")}`;
+
+        if (!beers[id]) {
+
+          updates[`beers/${id}`] = {
+
+            name: `Hana ${String(i).padStart(2, "0")}`,
+
+            category: "tap",
+
+            number:
+              String(i).padStart(2, "0"),
+
+            order: i,
+
+            image: ""
+          };
+        }
+      }
+
+      // Multi-path update
+      // avoids overwriting existing beers.
 
       await set(
-        ref(
-          database,
-          `beers/${id}`
-        ),
+        ref(database),
         {
-
-          name,
-
-          category:
-            $("beerCategory")
-              .value,
-
-          number:
-            $("beerNumber")
-              .value
-              .trim(),
-
-          order:
-            Number(
-              $("beerOrder")
-                .value
-            ) || 1,
-
-          image
-
+          ...getExistingRootData(),
+          ...updates
         }
       );
 
-
-      modal(false);
-
-
-      notice(
-        `${$("beerNumber").value} · ${name} tallennettu ✓`
+      alert(
+        "24 laatikko-olutta ja 4 hanaolutta luotu!"
       );
-
 
     } catch (error) {
 
       console.error(error);
 
-      notice(
-        "Tallennus epäonnistui. Tarkista Firebase Storage ja Security Rules.",
-        true
+      alert(
+        "Olutpaikkojen luonti epäonnistui: " +
+        error.message
       );
-
     }
+  }
+);
 
-  };
 
+// --------------------------------------------------
+// CLEAR VOTES
+// --------------------------------------------------
 
-$("clearVotes").onclick =
+clearVotesButton?.addEventListener(
+  "click",
   async () => {
 
-    if (
-      !confirm(
-        "Poistetaanko KAIKKI äänet? Tätä ei voi perua."
-      )
-    ) {
+    if (!confirm(
+      "Poistetaanko KAIKKI äänet?"
+    )) {
       return;
     }
 
-
-    if (
-      !confirm(
-        "Varmista vielä: kaikki laatikko- ja hanaoluiden äänet poistetaan."
-      )
-    ) {
+    if (!confirm(
+      "Tätä ei voi perua. Poistetaanko kaikki äänet?"
+    )) {
       return;
     }
-
 
     try {
 
       await remove(
-        ref(
-          database,
-          "votes"
-        )
+        ref(database, "votes")
       );
 
-
-      notice(
-        "Kaikki äänet poistettu ✓"
-      );
+      alert("Kaikki äänet poistettu.");
 
     } catch (error) {
 
-      notice(
-        "Äänien poisto epäonnistui.",
-        true
+      console.error(error);
+
+      alert(
+        "Äänien poistaminen epäonnistui: " +
+        error.message
       );
-
     }
+  }
+);
 
+
+// --------------------------------------------------
+// LOGOUT
+// --------------------------------------------------
+
+logoutButton?.addEventListener(
+  "click",
+  async () => {
+
+    await signOut(auth);
+  }
+);
+
+
+// --------------------------------------------------
+// ESCAPE HTML
+// --------------------------------------------------
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+// --------------------------------------------------
+// EXISTING ROOT DATA
+// --------------------------------------------------
+//
+// This function is used when creating the initial
+// beer slots.
+//
+// NOTE:
+// We don't want to overwrite existing votes/users.
+//
+// --------------------------------------------------
+
+function getExistingRootData() {
+
+  return {
+    beers: beers
   };
+}
