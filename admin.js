@@ -567,14 +567,19 @@ createBeersButton?.addEventListener(
       // Multi-path update
       // avoids overwriting existing beers.
 
-      await set(
-        ref(database),
-        {
-          ...getExistingRootData(),
-          ...updates
-        }
-      );
+      import {
+        ref,
+        get,
+        set,
+        update,
+        remove,
+        onValue
+      } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
 
+      await update(
+        ref(database),
+        updates
+      );
       alert(
         "24 laatikko-olutta ja 4 hanaolutta luotu!"
       );
@@ -672,10 +677,3 @@ function escapeHtml(value) {
 // We don't want to overwrite existing votes/users.
 //
 // --------------------------------------------------
-
-function getExistingRootData() {
-
-  return {
-    beers: beers
-  };
-}
