@@ -16,6 +16,10 @@ let beers = [];
 let votes = {};
 
 
+/* --------------------------------------------------
+   HTML ESCAPE
+-------------------------------------------------- */
+
 const esc = value =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -28,6 +32,10 @@ const esc = value =>
     }[char])
   );
 
+
+/* --------------------------------------------------
+   CALCULATE RESULTS
+-------------------------------------------------- */
 
 function calculate() {
 
@@ -53,14 +61,16 @@ function calculate() {
 
       const total =
         vals.reduce(
-          (a,b) => a + b,
+          (a, b) => a + b,
           0
         );
 
 
       return {
         ...beer,
+
         count: vals.length,
+
         average:
           vals.length
             ? total / vals.length
@@ -68,89 +78,142 @@ function calculate() {
       };
 
     })
+
     .sort(
-      (a,b) =>
+      (a, b) =>
+
+        /* 1. Suurempi keskiarvo ensin */
         b.average - a.average ||
+
+        /* 2. Tasatilanteessa enemmän ääniä */
         b.count - a.count ||
-        (a.order ?? 999) -
-        (b.order ?? 999)
+
+        /* 3. Tasatilanteessa pienempi olutnumero */
+        (Number(a.order) || 999) -
+        (Number(b.order) || 999)
     );
 
 }
 
 
+/* --------------------------------------------------
+   PODIUM
+-------------------------------------------------- */
+
 function podiumHTML(items) {
 
   return items
-    .slice(0,3)
+    .slice(0, 3)
     .map(
-      (b,i) => `
+      (b, i) => {
 
-        <button
-          class="podium-item rank-${i+1}"
-          data-winner="${esc(b.id)}"
-        >
+        /*
+         * VAIN SIJA 1 SAA data-winner-attribuutin.
+         *
+         * Sijat 2 ja 3 eivät ole klikattavia
+         * voittajan avaamista varten.
+         */
 
-          <div class="rank">
-            ${i+1}
-          </div>
+        const winnerAttribute =
+          i === 0 && b.count > 0
+            ? `data-winner="${esc(b.id)}"`
+            : "";
 
 
-          <div class="result-photo">
+        const tag =
+          i === 0 && b.count > 0
+            ? "button"
+            : "div";
 
+
+        const closeTag =
+          tag === "button"
+            ? "button"
+            : "div";
+
+
+        return `
+
+          <${tag}
+            class="podium-item rank-${i + 1} ${
+              i === 0 && b.count > 0
+                ? "winner-clickable"
+                : ""
+            }"
+            ${winnerAttribute}
             ${
-              b.image
-                ? `<img
-                    src="${esc(b.image)}"
-                    alt=""
-                  >`
-                : "🍺"
+              tag === "button"
+                ? 'type="button"'
+                : ""
             }
+          >
 
-          </div>
-
-
-          <div class="result-number">
-            ${esc(
-              b.number || b.id
-            )}
-          </div>
+            <div class="rank">
+              ${i + 1}
+            </div>
 
 
-          <strong>
-            ${esc(b.name)}
-          </strong>
+            <div class="result-photo">
+
+              ${
+                b.image
+                  ? `<img
+                      src="${esc(b.image)}"
+                      alt=""
+                    >`
+                  : "🍺"
+              }
+
+            </div>
 
 
-          <span>
-            ${b.average.toFixed(2)} ★
-          </span>
+            <div class="result-number">
+              ${esc(
+                b.number || b.id
+              )}
+            </div>
 
 
-          <small>
-            ${b.count} ääntä
-          </small>
+            <strong>
+              ${esc(b.name)}
+            </strong>
 
-        </button>
 
-      `
+            <span>
+              ${b.average.toFixed(2)} ★
+            </span>
+
+
+            <small>
+              ${b.count} ääntä
+            </small>
+
+          </${closeTag}>
+
+        `;
+
+      }
     )
     .join("");
 
 }
 
 
+/* --------------------------------------------------
+   RANKING
+-------------------------------------------------- */
+
 function rankingHTML(items) {
 
   return items
     .slice(3)
     .map(
-      (b,i) => `
+      (b, i) => `
 
         <div class="rank-row">
 
           <span class="rank-num">
-            ${i+4}.
+            ${i + 4}.
           </span>
 
 
@@ -199,59 +262,81 @@ function rankingHTML(items) {
 }
 
 
+/* --------------------------------------------------
+   RENDER
+-------------------------------------------------- */
+
 function render() {
 
   const all =
     calculate();
 
 
+  /*
+   * Erotellaan laatikko- ja hanaoluet.
+   */
+
   const box =
     all.filter(
-      b => b.category === "box"
+      b =>
+        b.category === "box"
     );
 
 
   const tap =
     all.filter(
-      b => b.category === "tap"
+      b =>
+        b.category === "tap"
     );
 
+
+  /* ------------------------------------------------
+     LAATIKKO-OLUET
+  ------------------------------------------------ */
 
   $("boxPodium").innerHTML =
     box.length
       ? podiumHTML(box)
-      : `<div class="notice">
-          Ei vielä tuloksia.
-        </div>`;
-
-
-  $("tapPodium").innerHTML =
-    tap.length
-      ? podiumHTML(tap)
-      : `<div class="notice">
-          Ei vielä tuloksia.
-        </div>`;
+      : `
+          <div class="notice">
+            Ei vielä tuloksia.
+          </div>
+        `;
 
 
   $("boxRanking").innerHTML =
     rankingHTML(box);
 
 
-  $("tapRanking").innerHTML =
-    rankingHTML(tap);
-
-
   $("boxVotes").textContent =
     `${box.reduce(
-      (sum,b) =>
+      (sum, b) =>
         sum + b.count,
       0
     )} ääntä`;
 
 
+  /* ------------------------------------------------
+     HANAAOLUET
+  ------------------------------------------------ */
+
+  $("tapPodium").innerHTML =
+    tap.length
+      ? podiumHTML(tap)
+      : `
+          <div class="notice">
+            Ei vielä tuloksia.
+          </div>
+        `;
+
+
+  $("tapRanking").innerHTML =
+    rankingHTML(tap);
+
+
   $("tapVotes").textContent =
     `${tap.reduce(
-      (sum,b) =>
+      (sum, b) =>
         sum + b.count,
       0
     )} ääntä`;
@@ -259,68 +344,140 @@ function render() {
 }
 
 
+/* --------------------------------------------------
+   SHOW WINNER
+-------------------------------------------------- */
+
 function showWinner(id) {
 
-  const b =
-    calculate()
-      .find(
-        x => x.id === id
-      );
+  /*
+   * Lasketaan tulokset uudelleen.
+   */
+
+  const all =
+    calculate();
 
 
-  if (!b) {
+  /*
+   * Etsitään klikattu olut.
+   */
+
+  const clickedBeer =
+    all.find(
+      beer =>
+        beer.id === id
+    );
+
+
+  if (!clickedBeer) {
     return;
   }
 
 
+  /*
+   * TÄRKEÄ KORJAUS:
+   *
+   * Tarkistetaan, että klikattu olut on
+   * oman kategoriansa oikeasti 1. sijalla.
+   */
+
+  const categoryResults =
+    all.filter(
+      beer =>
+        beer.category ===
+        clickedBeer.category
+    );
+
+
+  const winner =
+    categoryResults[0];
+
+
+  /*
+   * Jos klikattu olut EI ole ykkönen,
+   * voittajaikkunaa ei avata.
+   */
+
+  if (
+    !winner ||
+    winner.id !== clickedBeer.id
+  ) {
+    return;
+  }
+
+
+  /*
+   * Lisäksi ykkösellä täytyy olla vähintään
+   * yksi oikea ääni.
+   */
+
+  if (winner.count < 1) {
+    return;
+  }
+
+
+  /* ------------------------------------------------
+     VOITTAJAN TIEDOT
+  ------------------------------------------------ */
+
   $("winnerCard").className =
     `winner-card ${
-      b.category === "tap"
+      winner.category === "tap"
         ? "tap-winner"
         : "box-winner"
     }`;
 
 
   $("winnerCategory").textContent =
-    b.category === "tap"
+    winner.category === "tap"
       ? "HANAVOITTAJA"
       : "LAATIKKOVOITTAJA";
 
 
   $("winnerNumber").textContent =
-    b.number || b.id;
+    winner.number ||
+    winner.id;
 
 
   $("winnerName").textContent =
-    b.name;
+    winner.name;
 
 
   $("winnerScore").textContent =
-    `${b.average.toFixed(2)} ★`;
+    `${winner.average.toFixed(2)} ★`;
 
 
   $("winnerVotes").textContent =
-    `${b.count} ääntä`;
+    `${winner.count} ääntä`;
 
 
   $("winnerImage").innerHTML =
-    b.image
+    winner.image
       ? `<img
-          src="${esc(b.image)}"
+          src="${esc(winner.image)}"
           alt=""
         >`
       : "🍺";
 
 
+  /* ------------------------------------------------
+     CONFETTI
+  ------------------------------------------------ */
+
   $("winnerConfetti").innerHTML =
     Array.from(
-      {length:28},
-      (_,i) =>
+      { length: 28 },
+      (_, i) =>
         `<i style="--i:${i}">
           ✦
         </i>`
-    ).join("");
+    )
+    .join("");
 
+
+  /* ------------------------------------------------
+     AVAA VOITTAJA-MODAL
+  ------------------------------------------------ */
 
   $("winnerModal")
     .classList
@@ -329,9 +486,21 @@ function showWinner(id) {
 }
 
 
+/* --------------------------------------------------
+   CLICK HANDLER
+-------------------------------------------------- */
+
 document.addEventListener(
   "click",
   event => {
+
+    /*
+     * Etsitään elementti, jolla on
+     * data-winner.
+     *
+     * HUOM:
+     * Nyt vain 1. sija saa tämän attribuutin.
+     */
 
     const item =
       event.target.closest(
@@ -348,9 +517,14 @@ document.addEventListener(
     }
 
 
+    /*
+     * Sulje voittajaikkuna.
+     */
+
     if (
       event.target.id ===
         "closeWinner" ||
+
       event.target.classList.contains(
         "modal-backdrop"
       )
@@ -366,6 +540,10 @@ document.addEventListener(
 );
 
 
+/* --------------------------------------------------
+   BEERS
+-------------------------------------------------- */
+
 onValue(
   ref(database, "beers"),
   snapshot => {
@@ -377,7 +555,7 @@ onValue(
     beers =
       Object.entries(data)
         .map(
-          ([id,value]) => ({
+          ([id, value]) => ({
             id,
             ...value
           })
@@ -389,6 +567,10 @@ onValue(
   }
 );
 
+
+/* --------------------------------------------------
+   VOTES
+-------------------------------------------------- */
 
 onValue(
   ref(database, "votes"),
